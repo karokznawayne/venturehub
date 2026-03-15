@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VentureHub — Business Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Devanagari:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+/* ===== CSS VARIABLES & RESET ===== */
+:root {
+  --bg: #fdf8f2;
+  --bg2: #f5ede0;
+  --bg3: #ede1d0;
+  --ink: #1a1208;
+  --ink2: #5a4a36;
+  --ink3: #8a7560;
+  --gold: #c08b2a;
+  --gold-light: #e8b84b;
+  --teal: #0d4040;
+  --teal-mid: #165c5c;
+  --teal-light: #2a8080;
+  --teal-pale: #d2ebeb;
+  --red: #c0392b;
+  --green: #1a7a4a;
+  --white: #ffffff;
+  --shadow-sm: 0 2px 8px rgba(26,18,8,0.08);
+  --shadow-md: 0 6px 24px rgba(26,18,8,0.12);
+  --shadow-lg: 0 16px 48px rgba(26,18,8,0.16);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-hindi: 'Noto Sans Devanagari', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+[data-lang="hi"] body,
+[data-lang="hi"] .lang-aware {
+  font-family: var(--font-hindi), var(--font-body);
+}
+img { max-width: 100%; display: block; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--teal-light); border-radius: 4px; }
+
+/* ===== NAVBAR ===== */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(253,248,242,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bg3);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 700;
+  color: var(--teal);
+}
+.nav-brand .brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold); display: inline-block;
+}
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+.lang-switcher {
+  display: flex; gap: 4px;
+  background: var(--bg2); border-radius: 8px; padding: 3px;
+}
+.lang-btn {
+  background: none; border: none;
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 0.78rem; font-weight: 500;
+  color: var(--ink2); transition: var(--transition);
+}
+.lang-btn.active {
+  background: var(--teal); color: var(--white);
+}
+.lang-btn:hover:not(.active) { background: var(--bg3); }
+.nav-link {
+  background: none; border: none; padding: 6px 14px;
+  border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+  color: var(--ink2); transition: var(--transition);
+}
+.nav-link:hover { background: var(--bg2); color: var(--teal); }
+.nav-link.active { color: var(--teal); font-weight: 600; }
+.btn-primary {
+  background: var(--teal); color: var(--white);
+  border: none; padding: 8px 20px; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 600;
+  transition: var(--transition); box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover { background: var(--teal-mid); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.user-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--teal-pale); border-radius: 8px; padding: 5px 12px;
+  font-size: 0.82rem; font-weight: 600; color: var(--teal);
+}
+.user-badge .avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--teal); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700;
+}
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: var(--transition); }
+
+/* ===== VIEWS ===== */
+.view { display: none; padding-top: 64px; min-height: 100vh; animation: fadeIn 0.4s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== HERO / HOME ===== */
+#view-home .hero {
+  position: relative; overflow: hidden;
+  min-height: calc(100vh - 64px);
+  display: flex; align-items: center;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 50%, #0a3030 100%);
+  padding: 4rem 2.5rem;
+}
+.hero-pattern {
+  position: absolute; inset: 0; opacity: 0.06;
+  background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.hero-glow {
+  position: absolute; top: -20%; right: -10%;
+  width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(192,139,42,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-content { position: relative; max-width: 1200px; margin: 0 auto; width: 100%; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: var(--gold-light); border-radius: 100px;
+  padding: 5px 16px; font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  animation: slideDown 0.7s 0.1s both ease;
+}
+.hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-light); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+@keyframes slideDown { from{opacity:0;transform:translateY(-16px);} to{opacity:1;transform:translateY(0);} }
+.hero h1 {
+  font-family: var(--font-display); font-size: clamp(2.8rem, 6vw, 5.2rem);
+  font-weight: 700; color: var(--white); line-height: 1.08;
+  margin-bottom: 1.4rem;
+  animation: slideUp 0.7s 0.2s both ease;
+}
+.hero h1 em { color: var(--gold-light); font-style: italic; }
+@keyframes slideUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+.hero-sub {
+  font-size: 1.12rem; color: rgba(255,255,255,0.72);
+  max-width: 520px; margin-bottom: 2.4rem;
+  animation: slideUp 0.7s 0.3s both ease;
+}
+.hero-ctas {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  animation: slideUp 0.7s 0.4s both ease;
+}
+.btn-gold {
+  background: var(--gold); color: var(--white);
+  border: none; padding: 13px 28px; border-radius: 10px;
+  font-size: 0.95rem; font-weight: 600;
+  transition: var(--transition); box-shadow: 0 4px 20px rgba(192,139,42,0.4);
+}
+.btn-gold:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(192,139,42,0.5); }
+.btn-outline-white {
+  background: transparent; color: var(--white);
+  border: 1.5px solid rgba(255,255,255,0.4); padding: 13px 28px;
+  border-radius: 10px; font-size: 0.95rem; font-weight: 500;
+  transition: var(--transition);
+}
+.btn-outline-white:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.7); }
+
+.hero-stats {
+  display: flex; gap: 2.5rem; margin-top: 3rem;
+  padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.15);
+  animation: slideUp 0.7s 0.5s both ease;
+}
+.stat-item { text-align: center; }
+.stat-num { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--gold-light); }
+.stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+/* Feature cards on home */
+.features-section { padding: 5rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+.section-label {
+  text-transform: uppercase; letter-spacing: 0.1em;
+  font-size: 0.75rem; font-weight: 600; color: var(--gold);
+  margin-bottom: 0.6rem;
+}
+.section-title {
+  font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700; color: var(--teal); line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.section-sub { font-size: 1rem; color: var(--ink2); max-width: 520px; margin-bottom: 3rem; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+.feature-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 2rem; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--bg3); transition: var(--transition);
+  position: relative; overflow: hidden;
+}
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  opacity: 0; transition: var(--transition);
+}
+.feature-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: var(--teal-pale); display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 1.2rem;
+}
+.feature-card h3 {
+  font-family: var(--font-display); font-size: 1.25rem;
+  font-weight: 600; color: var(--teal); margin-bottom: 0.5rem;
+}
+.feature-card p { font-size: 0.9rem; color: var(--ink2); line-height: 1.65; }
+
+/* ===== REGISTRATION FORM ===== */
+#view-register { background: var(--bg); }
+.form-wrapper { max-width: 780px; margin: 0 auto; padding: 3rem 2.5rem 5rem; }
+.form-header { margin-bottom: 2.5rem; }
+.form-header .section-title { margin-bottom: 0.4rem; }
+.form-header p { color: var(--ink2); font-size: 0.95rem; }
+.type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2.5rem; }
+.type-card {
+  border: 2px solid var(--bg3); border-radius: var(--radius);
+  padding: 1.4rem 1.5rem; cursor: pointer; transition: var(--transition);
+  background: var(--white); display: flex; flex-direction: column; gap: 6px;
+}
+.type-card:hover { border-color: var(--teal-light); }
+.type-card.selected { border-color: var(--teal); background: var(--teal-pale); }
+.type-card .type-icon { font-size: 1.8rem; }
+.type-card .type-title { font-weight: 600; color: var(--teal); font-size: 1rem; }
+.type-card .type-desc { font-size: 0.82rem; color: var(--ink2); }
+.form-section-title {
+  font-family: var(--font-display); font-size: 1.15rem;
+  font-weight: 600; color: var(--teal);
+  margin: 2rem 0 1rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--bg3);
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.form-grid.full { grid-template-columns: 1fr; }
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.form-field.span2 { grid-column: span 2; }
+.form-field label {
+  font-size: 0.82rem; font-weight: 600; color: var(--ink2);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.form-field label .required { color: var(--red); margin-left: 2px; }
+.form-field input, .form-field select, .form-field textarea {
+  border: 1.5px solid var(--bg3); border-radius: 8px;
+  padding: 10px 14px; font-size: 0.92rem; color: var(--ink);
+  background: var(--white); transition: var(--transition);
+  outline: none;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+  border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,64,64,0.08);
+}
+.form-field textarea { min-height: 100px; resize: vertical; }
+.form-field .hint { font-size: 0.78rem; color: var(--ink3); }
+.collab-section { display: none; }
+.collab-section.show { display: block; }
+.partner-entry {
+  background: var(--bg2); border-radius: var(--radius);
+  padding: 1.2rem; margin-bottom: 0.8rem;
+  border: 1px solid var(--bg3);
+}
+.partner-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.partner-header span { font-weight: 600; font-size: 0.9rem; color: var(--teal); }
+.btn-remove {
+  background: none; border: none; color: var(--red);
+  font-size: 0.82rem; font-weight: 600; padding: 4px 8px;
+  border-radius: 6px; transition: var(--transition);
+}
+.btn-remove:hover { background: rgba(192,57,43,0.08); }
+.btn-add-partner {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 1.5px dashed var(--teal-light);
+  color: var(--teal); border-radius: 8px; padding: 10px 18px;
+  font-size: 0.88rem; font-weight: 600; width: 100%;
+  justify-content: center; margin-top: 0.5rem; transition: var(--transition);
+}
+.btn-add-partner:hover { background: var(--teal-pale); }
+.category-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.category-tag {
+  background: var(--bg2); border: 1.5px solid var(--bg3);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 0.82rem; cursor: pointer; transition: var(--transition);
+  font-weight: 500; color: var(--ink2);
+}
+.category-tag.selected { background: var(--teal); color: var(--white); border-color: var(--teal); }
+.upload-zone {
+  border: 2px dashed var(--bg3); border-radius: var(--radius);
+  padding: 2rem; text-align: center; cursor: pointer;
+  transition: var(--transition); background: var(--white);
+}
+.upload-zone:hover { border-color: var(--teal-light); background: var(--teal-pale); }
+.upload-zone .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.upload-zone p { font-size: 0.88rem; color: var(--ink2); }
+.upload-zone .upload-hint { font-size: 0.78rem; color: var(--ink3); margin-top: 4px; }
+.form-actions { display: flex; gap: 1rem; margin-top: 2.5rem; justify-content: flex-end; }
+.btn-secondary {
+  background: var(--bg2); color: var(--ink2); border: none;
+  padding: 11px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+  transition: var(--transition);
+}
+.btn-secondary:hover { background: var(--bg3); }
+.btn-submit {
+  background: linear-gradient(135deg, var(--teal), var(--teal-mid));
+  color: var(--white); border: none; padding: 11px 32px;
+  border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+  transition: var(--transition); box-shadow: 0 4px 16px rgba(13,64,64,0.25);
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(13,64,64,0.3); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.validation-message { font-size: 0.78rem; color: var(--red); margin-top: 3px; display: none; }
+.form-field.error input, .form-field.error select, .form-field.error textarea {
+  border-color: var(--red);
+}
+.form-field.error .validation-message { display: block; }
+
+/* ===== PENDING VIEW ===== */
+#view-pending {
+  display: none; align-items: center; justify-content: center;
+  background: var(--bg);
+}
+#view-pending.active { display: flex; }
+.pending-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 4rem 3rem; text-align: center; max-width: 540px;
+  box-shadow: var(--shadow-lg); border: 1px solid var(--bg3);
+  animation: scaleIn 0.5s ease;
+}
+@keyframes scaleIn { from{opacity:0;transform:scale(0.94);} to{opacity:1;transform:scale(1);} }
+.pending-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; margin: 0 auto 1.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+.pending-card h2 {
+  font-family: var(--font-display); font-size: 1.9rem;
+  color: var(--teal); margin-bottom: 0.8rem;
+}
+.pending-card p { color: var(--ink2); font-size: 0.95rem; margin-bottom: 0.5rem; }
+.pending-ref {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--teal-pale); color: var(--teal);
+  border-radius: 8px; padding: 8px 16px; font-size: 0.88rem;
+  font-weight: 700; margin: 1.2rem 0 2rem; letter-spacing: 0.05em;
+}
+.status-steps { display: flex; justify-content: center; gap: 0; margin: 1.5rem 0; }
+.step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; }
+.step-item + .step-item::before {
+  content: ''; position: absolute; top: 16px; left: -50%;
+  width: 100%; height: 2px; background: var(--bg3); z-index: 0;
+}
+.step-item.done + .step-item::before { background: var(--gold); }
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--bg3); background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; position: relative; z-index: 1;
+  transition: var(--transition);
+}
+.step-item.done .step-dot { background: var(--gold); border-color: var(--gold); color: var(--white); }
+.step-item.active .step-dot { border-color: var(--teal); color: var(--teal); box-shadow: 0 0 0 4px rgba(13,64,64,0.12); }
+.step-label { font-size: 0.72rem; color: var(--ink2); text-align: center; font-weight: 500; }
+
+/* ===== DASHBOARD ===== */
+#view-dashboard { background: var(--bg); }
+.dashboard-wrapper { max-width: 1200px; margin: 0 auto; padding: 2.5rem; }
+.dash-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+}
+.dash-greeting .welcome-text { font-size: 0.82rem; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; }
+.dash-greeting h2 { font-family: var(--font-display); font-size: 2rem; color: var(--teal); margin-top: 2px; }
+.dash-greeting .biz-name { color: var(--gold); }
+.dash-meta {
+  display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;
+}
+.status-badge {
+  padding: 5px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.status-badge.approved { background: rgba(26,122,74,0.1); color: var(--green); }
+.status-badge.pending { background: rgba(192,139,42,0.12); color: var(--gold); }
+.status-badge.rejected { background: rgba(192,57,43,0.1); color: var(--red); }
+.status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.dash-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem; }
+.stat-card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 1.4rem; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--bg3); transition: var(--transition);
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-card .label { font-size: 0.78rem; color: var(--ink3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-card .value { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--teal); margin: 4px 0; }
+.stat-card .change { font-size: 0.78rem; color: var(--green); font-weight: 500; }
+
+.services-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.4rem;
+}
+.services-header h3 { font-family: var(--font-display); font-size: 1.4rem; color: var(--teal); }
+.btn-add-service {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--teal); color: var(--white); border: none;
+  padding: 9px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+  transition: var(--transition);
+}
+.btn-add-service:hover { background: var(--teal-mid); transform: translateY(-1px); }
+
+.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.4rem; }
+.service-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--bg3); overflow: hidden;
+  box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.service-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.service-card-img {
+  height: 160px; background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 100%);
+  position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+}
+.service-card-img .img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3));
+}
+.service-card-body { padding: 1.2rem; }
+.service-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.service-tag-pill {
+  background: var(--teal-pale); color: var(--teal);
+  border-radius: 100px; padding: 2px 10px; font-size: 0.72rem; font-weight: 600;
+}
+.service-card-body h4 {
+  font-family: var(--font-display); font-size: 1.15rem;
+  font-weight: 600; color: var(--ink); margin-bottom: 0.4rem;
+}
+.service-card-body p { font-size: 0.85rem; color: var(--ink2); line-height: 1.55; }
+.service-card-footer {
+  padding: 0.9rem 1.2rem; border-top: 1px solid var(--bg2);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.service-price { font-weight: 700; color: var(--teal); font-size: 1rem; }
+.service-price .currency { font-size: 0.78rem; font-weight: 500; color: var(--ink3); }
+.service-metrics { display: flex; gap: 12px; }
+.metric { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--ink3); font-weight: 500; }
+.service-card-actions {
+  display: flex; gap: 6px; padding: 0.7rem 1.2rem;
+  border-top: 1px solid var(--bg2); background: var(--bg);
+}
+.btn-edit, .btn-delete {
+  flex: 1; padding: 7px; border-radius: 6px; font-size: 0.8rem;
+  font-weight: 600; border: none; transition: var(--transition);
+}
+.btn-edit { background: var(--teal-pale); color: var(--teal); }
+.btn-edit:hover { background: var(--teal); color: var(--white); }
+.btn-delete { background: rgba(192,57,43,0.08); color: var(--red); }
+.btn-delete:hover { background: var(--red); color: var(--white); }
+.empty-services {
+  grid-column: 1/-1; text-align: center;
+  padding: 3.5rem 2rem; background: var(--white);
+  border-radius: var(--radius-lg); border: 2px dashed var(--bg3);
+}
+.empty-services .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty-services h4 { font-family: var(--font-display); font-size: 1.3rem; color: var(--teal); margin-bottom: 0.4rem; }
+.empty-services p { font-size: 0.9rem; color: var(--ink2); }
+
+/* ===== BROWSE / CUSTOMER VIEW ===== */
+#view-browse { background: var(--bg); }
+.browse-wrapper { max-width: 1200px; margin: 0 auto; padding: 2.5rem; }
+.browse-header { margin-bottom: 2rem; }
+.browse-header h2 { font-family: var(--font-display); font-size: 2.2rem; color: var(--teal); margin-bottom: 0.5rem; }
+.browse-header p { color: var(--ink2); font-size: 0.95rem; }
+.browse-controls {
+  display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;
+}
+.search-box {
+  position: relative; flex: 1; min-width: 220px;
+}
+.search-box input {
+  width: 100%; padding: 10px 14px 10px 40px;
+  border: 1.5px solid var(--bg3); border-radius: 10px;
+  font-size: 0.9rem; background: var(--white); transition: var(--transition); outline: none;
+}
+.search-box input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,64,64,0.08); }
+.search-box .search-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--ink3); font-size: 1rem; pointer-events: none;
+}
+.sort-control { display: flex; gap: 4px; background: var(--bg2); border-radius: 8px; padding: 3px; }
+.sort-btn {
+  background: none; border: none; padding: 6px 14px;
+  border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+  color: var(--ink2); cursor: pointer; transition: var(--transition);
+}
+.sort-btn.active { background: var(--teal); color: var(--white); }
+.sort-btn:hover:not(.active) { background: var(--bg3); }
+.filter-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-tag {
+  background: var(--bg2); border: 1.5px solid var(--bg3);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: var(--transition); color: var(--ink2);
+}
+.filter-tag.active { background: var(--teal); color: var(--white); border-color: var(--teal); }
+.filter-tag:hover:not(.active) { border-color: var(--teal-light); }
+.browse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+.browse-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--bg3); overflow: hidden;
+  box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.browse-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.browse-card-banner {
+  height: 180px; display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; position: relative; overflow: hidden;
+}
+.browse-card-body { padding: 1.4rem; }
+.browse-biz-info {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 0.8rem;
+}
+.biz-avatar {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: var(--white);
+  flex-shrink: 0;
+}
+.biz-avatar-name { font-size: 0.8rem; color: var(--ink2); font-weight: 500; }
+.verified-icon { font-size: 0.85rem; margin-left: auto; }
+.browse-card-body h4 {
+  font-family: var(--font-display); font-size: 1.2rem;
+  font-weight: 600; color: var(--ink); margin-bottom: 0.5rem;
+}
+.browse-card-body p { font-size: 0.87rem; color: var(--ink2); line-height: 1.6; margin-bottom: 1rem; }
+.browse-card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.4rem; border-top: 1px solid var(--bg2);
+}
+.browse-price { font-weight: 700; color: var(--teal); font-size: 1.05rem; }
+.like-comment-group { display: flex; gap: 12px; }
+.action-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: 1.5px solid var(--bg3);
+  border-radius: 100px; padding: 5px 13px;
+  font-size: 0.82rem; font-weight: 600; color: var(--ink2);
+  cursor: pointer; transition: var(--transition);
+}
+.action-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-pale); }
+.action-btn.liked { background: rgba(192,57,43,0.08); border-color: var(--red); color: var(--red); }
+.rank-badge {
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  background: rgba(0,0,0,0.65); color: var(--white);
+  border-radius: 8px; padding: 3px 10px; font-size: 0.75rem; font-weight: 700;
+  backdrop-filter: blur(4px);
+}
+
+/* ===== ADMIN PANEL ===== */
+#view-admin { background: var(--bg); }
+.admin-wrapper { max-width: 1200px; margin: 0 auto; padding: 2.5rem; }
+.admin-tabs { display: flex; gap: 4px; background: var(--bg2); border-radius: 10px; padding: 4px; margin-bottom: 2rem; width: fit-content; }
+.admin-tab {
+  padding: 8px 20px; border-radius: 8px; font-size: 0.88rem;
+  font-weight: 600; border: none; background: none; color: var(--ink2);
+  cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px;
+}
+.admin-tab.active { background: var(--white); color: var(--teal); box-shadow: var(--shadow-sm); }
+.admin-tab .badge-count {
+  background: var(--red); color: var(--white);
+  border-radius: 100px; padding: 1px 7px; font-size: 0.7rem;
+  font-weight: 700; min-width: 18px; text-align: center;
+}
+/* Dashboard Tabs [NEW Phase 5] */
+.dash-tabs {
+  display: flex; gap: 8px; margin-bottom: 2rem;
+  background: var(--bg2); border-radius: 12px; padding: 6px;
+  overflow-x: auto;
+}
+.dash-tab {
+  background: none; border: none; padding: 10px 20px;
+  border-radius: 8px; font-size: 0.88rem; font-weight: 600;
+  color: var(--ink2); cursor: pointer; transition: var(--transition);
+  white-space: nowrap; display: flex; align-items: center; gap: 6px;
+}
+.dash-tab.active {
+  background: var(--white); color: var(--teal); box-shadow: var(--shadow-sm);
+}
+.dash-tab:hover:not(.active) { background: var(--bg3); }
+.leads-list { display: flex; flex-direction: column; gap: 1rem; }
+.submission-item {
+  background: var(--white); border-radius: var(--radius);
+  padding: 1.4rem 1.6rem; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--bg3); display: grid;
+  grid-template-columns: auto 1fr auto; gap: 1.2rem; align-items: center;
+  transition: var(--transition);
+}
+.submission-item:hover { box-shadow: var(--shadow-md); }
+.submission-avatar {
+  width: 48px; height: 48px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 700; color: var(--white);
+  flex-shrink: 0;
+}
+.submission-info h4 { font-weight: 600; color: var(--ink); font-size: 0.95rem; margin-bottom: 2px; }
+.submission-info .sub-meta { font-size: 0.8rem; color: var(--ink2); display: flex; gap: 12px; flex-wrap: wrap; }
+.sub-meta span { display: flex; align-items: center; gap: 4px; }
+.submission-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-approve {
+  background: rgba(26,122,74,0.1); color: var(--green);
+  border: 1.5px solid rgba(26,122,74,0.25); border-radius: 8px;
+  padding: 7px 16px; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: var(--transition);
+}
+.btn-approve:hover { background: var(--green); color: var(--white); border-color: var(--green); }
+.btn-reject {
+  background: rgba(192,57,43,0.08); color: var(--red);
+  border: 1.5px solid rgba(192,57,43,0.2); border-radius: 8px;
+  padding: 7px 16px; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: var(--transition);
+}
+.btn-reject:hover { background: var(--red); color: var(--white); border-color: var(--red); }
+.btn-view-details {
+  background: none; border: none; color: var(--teal);
+  font-size: 0.82rem; font-weight: 600; padding: 7px 10px;
+  border-radius: 8px; cursor: pointer; transition: var(--transition);
+}
+.btn-view-details:hover { background: var(--teal-pale); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(26,18,8,0.6); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  width: 100%; max-width: 540px; max-height: 90vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.3s ease;
+}
+.modal-header {
+  padding: 1.5rem 1.8rem 0; display: flex;
+  justify-content: space-between; align-items: flex-start;
+}
+.modal-header h3 { font-family: var(--font-display); font-size: 1.4rem; color: var(--teal); }
+.modal-close {
+  background: var(--bg2); border: none; width: 32px; height: 32px;
+  border-radius: 50%; font-size: 1rem; cursor: pointer;
+  transition: var(--transition); display: flex; align-items: center; justify-content: center;
+  color: var(--ink2); flex-shrink: 0;
+}
+.modal-close:hover { background: var(--bg3); }
+.modal-body { padding: 1.2rem 1.8rem 2rem; }
+.modal-body .form-grid { grid-template-columns: 1fr; }
+
+/* ===== TOAST ===== */
+#toast-container {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 3000;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--ink); color: var(--white);
+  border-radius: 10px; padding: 12px 18px; font-size: 0.88rem; font-weight: 500;
+  box-shadow: var(--shadow-lg); min-width: 240px; max-width: 340px;
+  animation: toastIn 0.3s ease;
+}
+.toast.success { background: var(--teal); }
+.toast.error { background: var(--red); }
+.toast.warning { background: var(--gold); }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+@keyframes toastOut { from{opacity:1;transform:translateX(0);} to{opacity:0;transform:translateX(20px);} }
+
+/* ===== LOADING ===== */
+.spinner {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== ADMIN LOGIN ===== */
+.admin-login-wrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100vh - 64px); padding: 2rem;
+}
+.admin-login-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  padding: 2.5rem; width: 100%; max-width: 400px;
+  box-shadow: var(--shadow-lg); border: 1px solid var(--bg3);
+}
+.admin-login-card h3 { font-family: var(--font-display); font-size: 1.6rem; color: var(--teal); margin-bottom: 0.3rem; }
+.admin-login-card p { font-size: 0.85rem; color: var(--ink2); margin-bottom: 1.5rem; }
+.admin-panel-inner { display: none; }
+.admin-panel-inner.show { display: block; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-actions .nav-link, .nav-actions .btn-primary { display: none; }
+  .hamburger { display: flex; }
+  .mobile-nav {
+    position: fixed; top: 64px; left: 0; right: 0; z-index: 999;
+    background: var(--white); border-bottom: 1px solid var(--bg3);
+    padding: 1rem; display: none; flex-direction: column; gap: 6px;
+    box-shadow: var(--shadow-md);
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav button { text-align: left; padding: 10px 14px; border-radius: 8px; background: none; border: none; font-size: 0.9rem; font-weight: 500; color: var(--ink2); }
+  .mobile-nav button:hover { background: var(--bg2); }
+  .hero-stats { gap: 1.5rem; }
+  .form-grid { grid-template-columns: 1fr !important; }
+  .form-field.span2 { grid-column: span 1; }
+  .type-selector { grid-template-columns: 1fr; }
+  .dash-header { flex-direction: column; }
+  .submission-item { grid-template-columns: auto 1fr; }
+  .submission-actions { grid-column: 1/-1; }
+  .features-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  #navbar { padding: 0 1.2rem; }
+  .form-wrapper, .dashboard-wrapper, .browse-wrapper, .admin-wrapper { padding: 1.5rem; }
+  .hero { padding: 3rem 1.5rem; }
+  .hero h1 { font-size: 2.4rem; }
+}
+
+/* ===== UTILITY ===== */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.hidden { display: none !important; }
+.flex { display: flex; }
+.gap-1 { gap: 0.5rem; }
+.items-center { align-items: center; }
+hr.divider { border: none; border-top: 1px solid var(--bg3); margin: 2rem 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <span class="brand-dot"></span>
+    VentureHub
+  </div>
+  <div class="nav-actions">
+    <div class="lang-switcher" role="group" aria-label="Language selector">
+      <button class="lang-btn active" data-lang-switch="en" onclick="switchLang('en')">EN</button>
+      <button class="lang-btn" data-lang-switch="hi" onclick="switchLang('hi')">हिं</button>
+    </div>
+    <button class="nav-link" onclick="showView('browse')" data-i18n="nav.browse">Browse Services</button>
+    <div id="nav-user-area"></div>
+    <button class="btn-primary" onclick="showView('register')" data-i18n="nav.register">Register Business</button>
+    <div class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobile-nav">
+  <button onclick="showView('home');closeMobileNav()" data-i18n="nav.home">Home</button>
+  <button onclick="showView('browse');closeMobileNav()" data-i18n="nav.browse">Browse Services</button>
+  <button onclick="showView('register');closeMobileNav()" data-i18n="nav.register">Register Business</button>
+  <button onclick="showView('admin');closeMobileNav()" data-i18n="nav.admin">Admin Panel</button>
+</div>
+
+<!-- ===== HOME VIEW ===== -->
+<div class="view active" id="view-home">
+  <section class="hero">
+    <div class="hero-pattern"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-tag" data-i18n="hero.tag">India's Business Discovery Platform</div>
+      <h1 data-i18n-html="hero.h1">Connect, Register, and <em>Grow</em> Your Business</h1>
+      <p class="hero-sub" data-i18n="hero.sub">Register your individual or collaborative business, get approved, and showcase your services to thousands of customers.</p>
+      <div class="hero-ctas">
+        <button class="btn-gold" onclick="showView('register')" data-i18n="hero.cta1">Register Your Business</button>
+        <button class="btn-outline-white" onclick="showView('browse')" data-i18n="hero.cta2">Browse Services</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-businesses">0</div>
+          <div class="stat-label" data-i18n="hero.stat1">Registered Businesses</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-services">0</div>
+          <div class="stat-label" data-i18n="hero.stat2">Active Services</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-pending">0</div>
+          <div class="stat-label" data-i18n="hero.stat3">Awaiting Review</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Businesses Spotlight [NEW Phase 5] -->
+  <section id="featured-spotlight" style="padding:4rem 2.5rem; background:var(--bg2);">
+    <div style="max-width:1200px; margin:0 auto;">
+      <div class="section-label">Spotlight</div>
+      <h2 class="section-title">Featured Business <em>Spotlight</em></h2>
+      <div id="featured-carousel" style="display:flex; gap:20px; overflow-x:auto; padding:1rem 0; scroll-snap-type:x mandatory;">
+        <p style="color:var(--ink3);">Loading spotlights...</p>
+      </div>
+    </div>
+  </section>
+  <section class="features-section">
+    <div class="section-label" data-i18n="features.label">How It Works</div>
+    <h2 class="section-title" data-i18n="features.title">Built for Every Business</h2>
+    <p class="section-sub" data-i18n="features.sub">From individual freelancers to multi-partner collaborations — we support every business structure.</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">📝</div><h3 data-i18n="feat1.title">Easy Registration</h3><p data-i18n="feat1.desc">Fill a structured form with your business details. Individual or collaborative — we support both models.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔍</div><h3 data-i18n="feat2.title">Admin Review</h3><p data-i18n="feat2.desc">Every submission goes through our quality review process. Once approved, you get instant access to your dashboard.</p></div>
+      <div class="feature-card"><div class="feature-icon">🚀</div><h3 data-i18n="feat3.title">Manage Services</h3><p data-i18n="feat3.desc">Add, edit, and manage your service listings from your personal business dashboard.</p></div>
+      <div class="feature-card"><div class="feature-icon">📊</div><h3 data-i18n="feat4.title">Ranked Discovery</h3><p data-i18n="feat4.desc">Customers find services sorted by likes and engagement. The best services naturally rise to the top.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== REGISTER VIEW ===== -->
+<div class="view" id="view-register">
+  <div class="form-wrapper">
+    <div class="form-header">
+      <div class="section-label" data-i18n="reg.label">Business Registration</div>
+      <h2 class="section-title" data-i18n="reg.title">Register Your Business</h2>
+      <p data-i18n="reg.sub">Fill in your details below. Your submission will be reviewed and approved within 24 hours.</p>
+    </div>
+
+    <!-- Business Type -->
+    <div class="section-label" data-i18n="reg.type">Select Business Type</div>
+    <div class="type-selector" id="type-selector">
+      <div class="type-card selected" data-type="individual" onclick="selectType('individual')">
+        <span class="type-icon">👤</span>
+        <span class="type-title" data-i18n="type.individual">Individual</span>
+        <span class="type-desc" data-i18n="type.individualDesc">Solo entrepreneur or freelancer operating independently.</span>
+      </div>
+      <div class="type-card" data-type="collaborative" onclick="selectType('collaborative')">
+        <span class="type-icon">🤝</span>
+        <span class="type-title" data-i18n="type.collab">Collaborative</span>
+        <span class="type-desc" data-i18n="type.collabDesc">Partnership, firm, or group of co-founders working together.</span>
+      </div>
+    </div>
+
+    <form id="registration-form" novalidate>
+      <!-- Owner Info -->
+      <div class="form-section-title" data-i18n="reg.sec1">Primary Owner Information</div>
+      <div class="form-grid">
+        <div class="form-field" id="field-ownerFirst">
+          <label>First Name <span class="required">*</span></label>
+          <input type="text" id="ownerFirst" name="ownerFirst" placeholder="Rahul" required />
+          <span class="validation-message">Please enter first name</span>
+        </div>
+        <div class="form-field" id="field-ownerLast">
+          <label>Last Name <span class="required">*</span></label>
+          <input type="text" id="ownerLast" name="ownerLast" placeholder="Sharma" required />
+          <span class="validation-message">Please enter last name</span>
+        </div>
+        <div class="form-field" id="field-ownerEmail">
+          <label data-i18n="form.email">Email Address <span class="required">*</span></label>
+          <input type="email" id="ownerEmail" name="ownerEmail" placeholder="rahul@example.com" required />
+          <span class="validation-message">Please enter a valid email</span>
+        </div>
+        <div class="form-field" id="field-ownerPhone">
+          <label data-i18n="form.phone">Phone Number <span class="required">*</span></label>
+          <input type="tel" id="ownerPhone" name="ownerPhone" placeholder="+91 98765 43210" required />
+          <span class="validation-message">Please enter phone number</span>
+        </div>
+        <div class="form-field" id="field-password">
+          <label>Account Password <span class="required">*</span></label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+          <span class="validation-message">Please enter a password</span>
+        </div>
+      </div>
+
+      <!-- Business Info -->
+      <div class="form-section-title" data-i18n="reg.sec2">Business Details</div>
+      <div class="form-grid">
+        <div class="form-field span2" id="field-bizName">
+          <label data-i18n="form.bizName">Business Name <span class="required">*</span></label>
+          <input type="text" id="bizName" name="bizName" placeholder="My Awesome Business" required />
+          <span class="validation-message">Please enter business name</span>
+        </div>
+        <div class="form-field span2">
+          <label data-i18n="form.bizDesc">Business Description <span class="required">*</span></label>
+          <textarea id="bizDesc" name="bizDesc" placeholder="Describe what your business does, the services you offer, and what sets you apart..." required></textarea>
+          <span class="validation-message">Please provide a description</span>
+        </div>
+        <div class="form-field" id="field-bizCity">
+          <label data-i18n="form.city">City / Town <span class="required">*</span></label>
+          <input type="text" id="bizCity" name="bizCity" placeholder="Faridabad" required />
+          <span class="validation-message">Please enter city</span>
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.state">State</label>
+          <select id="bizState" name="bizState">
+            <option value="">Select State</option>
+            <option value="HR" selected>Haryana</option>
+            <option value="DL">Delhi</option>
+            <option value="UP">Uttar Pradesh</option>
+            <option value="RJ">Rajasthan</option>
+            <option value="PB">Punjab</option>
+            <option value="MH">Maharashtra</option>
+            <option value="KA">Karnataka</option>
+            <option value="TN">Tamil Nadu</option>
+            <option value="GJ">Gujarat</option>
+            <option value="WB">West Bengal</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.website">Website / Portfolio</label>
+          <input type="url" id="bizWebsite" name="bizWebsite" placeholder="https://mybusiness.com" />
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.gst">GST Number (if applicable)</label>
+          <input type="text" id="bizGST" name="bizGST" placeholder="22AAAAA0000A1Z5" />
+        </div>
+        <div class="form-field span2">
+          <label data-i18n="form.category">Business Category <span class="required">*</span></label>
+          <div class="category-tags" id="category-tags">
+            <span class="category-tag" data-cat="Technology" onclick="toggleCategory(this)">💻 Technology</span>
+            <span class="category-tag" data-cat="Design" onclick="toggleCategory(this)">🎨 Design</span>
+            <span class="category-tag" data-cat="Education" onclick="toggleCategory(this)">📚 Education</span>
+            <span class="category-tag" data-cat="Food & Beverage" onclick="toggleCategory(this)">🍽️ Food & Beverage</span>
+            <span class="category-tag" data-cat="Health & Wellness" onclick="toggleCategory(this)">🏥 Health & Wellness</span>
+            <span class="category-tag" data-cat="Finance" onclick="toggleCategory(this)">💰 Finance</span>
+            <span class="category-tag" data-cat="Retail" onclick="toggleCategory(this)">🛍️ Retail</span>
+            <span class="category-tag" data-cat="Manufacturing" onclick="toggleCategory(this)">🏭 Manufacturing</span>
+            <span class="category-tag" data-cat="Agriculture" onclick="toggleCategory(this)">🌾 Agriculture</span>
+            <span class="category-tag" data-cat="Transport" onclick="toggleCategory(this)">🚗 Transport</span>
+            <span class="category-tag" data-cat="Consulting" onclick="toggleCategory(this)">📋 Consulting</span>
+            <span class="category-tag" data-cat="Events" onclick="toggleCategory(this)">🎉 Events</span>
+            <span class="category-tag" data-cat="Real Estate" onclick="toggleCategory(this)">🏘️ Real Estate</span>
+            <span class="category-tag" data-cat="Legal Services" onclick="toggleCategory(this)">⚖️ Legal Services</span>
+            <span class="category-tag" data-cat="Beauty & Spa" onclick="toggleCategory(this)">💅 Beauty & Spa</span>
+            <span class="category-tag" data-cat="Fitness & Sports" onclick="toggleCategory(this)">🏋️ Fitness & Sports</span>
+            <span class="category-tag" data-cat="Home Services" onclick="toggleCategory(this)">🛠️ Home Services</span>
+            <span class="category-tag" data-cat="Automotive" onclick="toggleCategory(this)">🚘 Automotive</span>
+            <span class="category-tag" data-cat="Pets" onclick="toggleCategory(this)">🐾 Pets</span>
+            <span class="category-tag" data-cat="Entertainment" onclick="toggleCategory(this)">🎥 Entertainment</span>
+          </div>
+          <span class="hint" data-i18n="form.categoryHint">Select one or more categories</span>
+          <span id="cat-error" class="validation-message" style="display:none;">Please select at least one category</span>
+        </div>
+      </div>
+
+      <!-- Collaborative Partners -->
+      <div class="collab-section" id="collab-section">
+        <div class="form-section-title" data-i18n="reg.sec3">Business Partners</div>
+        <div id="partners-list"></div>
+        <button type="button" class="btn-add-partner" onclick="addPartner()">
+          <span>+</span> <span data-i18n="reg.addPartner">Add Partner</span>
+        </button>
+      </div>
+
+      <!-- Documents -->
+      <div class="form-section-title" data-i18n="reg.sec4">Documents & Verification</div>
+      <div class="form-grid">
+        <div class="form-field span2">
+          <label data-i18n="form.logo">Business Logo</label>
+          <div class="upload-zone" onclick="document.getElementById('logoInput').click()">
+            <div class="upload-icon" id="logo-preview">🖼️</div>
+            <p data-i18n="form.uploadLogo">Click to upload your business logo</p>
+            <p class="upload-hint">PNG, JPG or SVG · Max 2MB</p>
+          </div>
+          <input type="file" id="logoInput" accept="image/*" hidden onchange="handleLogoUpload(this)" />
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.aadhaar">Aadhaar / ID Number <span class="required">*</span></label>
+          <input type="text" id="aadhaarNum" name="aadhaarNum" placeholder="XXXX XXXX XXXX" maxlength="14" required />
+          <span class="validation-message">Please enter your Aadhaar/ID number</span>
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.pan">PAN Number</label>
+          <input type="text" id="panNum" name="panNum" placeholder="ABCDE1234F" maxlength="10" />
+        </div>
+        <div class="form-field span2">
+          <label>
+            <input type="checkbox" id="terms-check" style="margin-right:6px;" /> 
+            <span data-i18n="form.terms">I agree to the Terms of Service and Privacy Policy. I confirm that all information provided is accurate and truthful.</span>
+          </label>
+          <span id="terms-error" class="validation-message" style="display:none;">You must accept the terms to proceed</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" onclick="showView('home')" data-i18n="btn.cancel">Cancel</button>
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <span data-i18n="btn.submit">Submit for Review</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== PENDING VIEW ===== -->
+<div class="view" id="view-pending">
+  <div class="pending-card">
+    <div class="pending-icon">⏳</div>
+    <h2 data-i18n="pending.title">Application Submitted!</h2>
+    <p data-i18n="pending.sub1">Your business registration is under review.</p>
+    <p data-i18n="pending.sub2">We'll notify you via email once approved.</p>
+    <div class="pending-ref" id="pending-ref-display">REF: #000000</div>
+    <div class="status-steps">
+      <div class="step-item done">
+        <div class="step-dot">✓</div>
+        <span class="step-label" data-i18n="step.submitted">Submitted</span>
+      </div>
+      <div class="step-item active">
+        <div class="step-dot">👁</div>
+        <span class="step-label" data-i18n="step.review">Under Review</span>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">✓</div>
+        <span class="step-label" data-i18n="step.approved">Approved</span>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">🚀</div>
+        <span class="step-label" data-i18n="step.live">Live</span>
+      </div>
+    </div>
+    <button class="btn-secondary" onclick="showView('home')" style="width:100%;margin-top:1rem;" data-i18n="btn.backHome">Back to Home</button>
+    <p style="font-size:0.78rem;color:var(--ink3);margin-top:0.8rem;" data-i18n="pending.admin">
+      Admin demo: <button class="btn-remove" onclick="showView('admin')" style="color:var(--teal);font-size:0.78rem;">Open Admin Panel →</button>
+    </p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD VIEW ===== -->
+<div class="view" id="view-dashboard">
+  <div class="dashboard-wrapper">
+    <div class="dash-header">
+      <div class="dash-greeting">
+        <div class="welcome-text" data-i18n="dash.welcome">Welcome Back</div>
+        <h2><span class="biz-name" id="dash-biz-name">Business Name</span></h2>
+      </div>
+      <div class="dash-meta">
+        <span class="status-badge approved" id="dash-status-badge">
+          <span id="dash-status-text" data-i18n="status.approved">Approved</span>
+        </span>
+        <button class="btn-secondary" onclick="logOut()" data-i18n="btn.logout">Sign Out</button>
+      </div>
+    </div>
+    <div class="dash-stats" id="dash-stats-grid">
+      <div class="stat-card">
+        <div class="label" data-i18n="dash.totalServices">Total Services</div>
+        <div class="value" id="stat-total-services">0</div>
+        <div class="change">+0 this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="dash.totalLikes">Total Likes</div>
+        <div class="value" id="stat-total-likes">0</div>
+        <div class="change" style="color:var(--gold);">↑ Growing</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" data-i18n="dash.totalComments">Comments</div>
+        <div class="value" id="stat-total-comments">0</div>
+        <div class="change" style="color:var(--teal);">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Business Type</div>
+        <div class="value" style="font-size:1.2rem;" id="stat-biz-type">—</div>
+        <div class="change">Registration type</div>
+      </div>
+    </div>
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchDashTab('services', this)">Services</button>
+      <button class="dash-tab" onclick="switchDashTab('products', this)">Products</button>
+      <button class="dash-tab" onclick="switchDashTab('leads', this)">Leads 📥</button>
+      <button class="dash-tab" onclick="switchDashTab('gallery', this)">Gallery 🖼️</button>
+      <button class="dash-tab" onclick="switchDashTab('qr', this)">QR Card 📱</button>
+    </div>
+
+    <!-- Services View -->
+    <div id="dash-services-view" class="dash-tab-content active">
+      <div class="services-header">
+        <h3 data-i18n="dash.myServices">My Services</h3>
+        <button class="btn-add-service" onclick="openAddServiceModal()">
+          <span>+</span> <span data-i18n="btn.addService">Add Service</span>
+        </button>
+      </div>
+      <div class="services-grid" id="dash-services-grid"></div>
+    </div>
+
+    <!-- Products View -->
+    <div id="dash-products-view" class="dash-tab-content">
+      <div class="services-header">
+        <h3>Product Inventory</h3>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-secondary" onclick="openBulkUploadModal()">📤 Bulk Upload</button>
+          <button class="btn-add-service" onclick="openAddProductModal()">
+            <span>+ Add Product</span>
+          </button>
+        </div>
+      </div>
+      <div class="services-grid" id="dash-products-grid"></div>
+    </div>
+
+    <!-- Leads View [NEW Phase 5] -->
+    <div id="dash-leads-view" class="dash-tab-content">
+      <div class="services-header">
+        <h3>Customer Enquiries (Leads)</h3>
+      </div>
+      <div class="leads-list" id="dash-leads-list">
+        <p style="text-align:center; padding:2rem; color:var(--ink3);">No enquiries yet.</p>
+      </div>
+    </div>
+
+    <!-- Gallery View [NEW Phase 5] -->
+    <div id="dash-gallery-view" class="dash-tab-content">
+      <div class="services-header">
+        <h3>Business Portfolio Gallery</h3>
+        <button class="btn-primary" onclick="openAddGalleryModal()">+ Upload Photo</button>
+      </div>
+      <div class="gallery-grid" id="dash-gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:1rem;"></div>
+    </div>
+
+    <!-- QR View [NEW Phase 5] -->
+    <div id="dash-qr-view" class="dash-tab-content">
+      <div class="services-header">
+        <h3>Business QR Card</h3>
+      </div>
+      <div class="qr-container" style="text-align:center; padding:2rem; background:var(--white); border-radius:var(--radius);">
+        <div id="qr-code-display" style="margin-bottom:1.5rem;"></div>
+        <p style="margin-bottom:1.5rem; color:var(--ink2);">Download and print this QR code for your shop. Customers can scan it to see your digital profile!</p>
+        <button class="btn-gold" onclick="downloadBusinessQR()">📥 Download QR Code</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== BROWSE VIEW ===== -->
+<div class="view" id="view-browse">
+  <div class="browse-wrapper">
+    <div class="browse-header">
+      <h2 data-i18n="browse.title">Discover Local Services</h2>
+      <p data-i18n="browse.sub">Explore services from verified businesses. Sort by likes or newest first.</p>
+    </div>
+    <div class="browse-controls">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="browse-search" placeholder="Search services..." oninput="renderBrowse()" data-i18n-placeholder="browse.search" />
+      </div>
+      <div class="sort-control">
+        <button class="sort-btn active" data-sort="likes" onclick="setSortMode('likes', this)" data-i18n="sort.likes">Most Liked</button>
+        <button class="sort-btn" data-sort="comments" onclick="setSortMode('comments', this)" data-i18n="sort.comments">Most Discussed</button>
+        <button class="sort-btn" data-sort="newest" onclick="setSortMode('newest', this)" data-i18n="sort.newest">Newest</button>
+      </div>
+    </div>
+    <div class="filter-tags" id="browse-filters">
+      <span class="filter-tag active" data-filter="all" onclick="setBrowseFilter('all', this)" data-i18n="filter.all">All</span>
+    </div>
+    <br/>
+    <div class="browse-tabs" style="display:flex; justify-content:center; gap:1rem; margin-bottom:1rem;">
+      <button class="browse-tab-btn active" onclick="setBrowseMode('services', this)">Services</button>
+      <button class="browse-tab-btn" onclick="setBrowseMode('products', this)">Products</button>
+    </div>
+    <div class="browse-grid" id="browse-grid">
+      <div class="empty-services" style="grid-column:1/-1">
+        <div class="empty-icon">🔍</div>
+        <h4 data-i18n="browse.empty">No Services Available</h4>
+        <p data-i18n="browse.emptyDesc">Approved businesses will appear here once they add their services.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PUBLIC BUSINESS PROFILE VIEW ===== -->
+<div class="view" id="view-public-biz">
+  <div style="max-width:1000px;margin:2rem auto;padding:2rem 0;">
+    <button onclick="history.back()||showView('browse')" style="margin-bottom:1.5rem;background:none;border:1px solid var(--ink3);border-radius:8px;padding:6px 18px;cursor:pointer;color:var(--ink2);">← Back</button>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.07);overflow:hidden;">
+      <div style="padding:2rem;display:flex;align-items:flex-start;gap:2rem;flex-wrap:wrap;">
+        <div id="pub-biz-avatar" style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;flex-shrink:0;">B</div>
+        <img id="pub-biz-logo" style="width:80px;height:80px;border-radius:50%;object-fit:cover;flex-shrink:0;display:none;" />
+        <div style="flex:1;min-width:200px;">
+          <h1 id="pub-biz-name" style="margin:0 0 0.5rem;font-family:var(--font-display);font-size:1.9rem;color:var(--ink1);">Business Name</h1>
+          <p id="pub-biz-desc" style="margin:0 0 1rem;color:var(--ink2);line-height:1.6;font-size:0.95rem;">Business description</p>
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.88rem;color:var(--ink3);">
+            <span id="pub-biz-loc">📍 City, State</span>
+            <span id="pub-biz-phone">📞 Phone</span>
+            <a id="pub-biz-web" href="#" target="_blank" style="color:var(--teal);text-decoration:none;">🌐 Website</a>
+          </div>
+        </div>
+        <div class="header-actions" style="flex-shrink:0;"></div>
+      </div>
+      <div id="pub-biz-gallery" style="padding:0 2rem;"></div>
+      <div style="padding:0 2rem 2rem;">
+        <h3 style="margin-bottom:1.5rem;font-family:var(--font-display);font-size:1.3rem;color:var(--ink1);">Our Offerings</h3>
+        <!-- Browse Section Tabs -->
+        <div class="browse-tabs" style="display:flex; justify-content:center; gap:1rem; margin-bottom:2rem;">
+          <button class="browse-tab-btn active" onclick="setBrowseMode('services', this)">Services</button>
+          <button class="browse-tab-btn" onclick="setBrowseMode('products', this)">Products</button>
+        </div>
+        <div id="pub-biz-services" class="services-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN VIEW ===== -->
+<div class="view" id="view-admin">
+  <div class="admin-wrapper">
+    <!-- Login Gate -->
+    <div id="admin-login-gate" class="admin-login-wrap">
+      <div class="admin-login-card">
+        <h3 id="gate-title">Login to Continue</h3>
+        <p id="gate-sub" style="color:var(--ink3);font-size:0.9rem;margin-bottom:1.5rem;">Sign in as Admin, Business, or Customer.</p>
+
+        <form id="login-form" onsubmit="universalLogin(); return false;">
+          <div class="form-field" style="margin-bottom:1rem;">
+            <label>Email Address</label>
+            <input type="email" id="admin-user" placeholder="admin@example.com" required />
+          </div>
+          <div class="form-field" style="margin-bottom:1.5rem;">
+            <label>Password</label>
+            <input type="password" id="admin-pass" placeholder="••••••••" required />
+          </div>
+          <p style="font-size:0.78rem;color:var(--ink3);margin-bottom:1rem;">Admin demo: admin@example.com / admin123</p>
+          <button type="submit" class="btn-submit" style="width:100%;">Sign In</button>
+          <p style="text-align:center;margin-top:1rem;font-size:0.85rem;">New customer? <a href="#" onclick="toggleClientReg();return false;" style="color:var(--teal);">Create Account</a></p>
+        </form>
+
+        <form id="client-reg-form" style="display:none;" onsubmit="clientRegister(); return false;">
+          <div class="form-field" style="margin-bottom:1rem;">
+            <label>First Name</label>
+            <input type="text" id="cr-first" placeholder="Jane" />
+          </div>
+          <div class="form-field" style="margin-bottom:1rem;">
+            <label>Last Name</label>
+            <input type="text" id="cr-last" placeholder="Doe" />
+          </div>
+          <div class="form-field" style="margin-bottom:1rem;">
+            <label>Email Address</label>
+            <input type="email" id="cr-email" placeholder="jane@example.com" />
+          </div>
+          <div class="form-field" style="margin-bottom:1.5rem;">
+            <label>Create Password</label>
+            <input type="password" id="cr-pass" placeholder="••••••••" />
+          </div>
+          <button class="btn-submit" style="width:100%;" onclick="clientRegister()">Sign Up as Customer</button>
+          <p style="text-align:center;margin-top:1rem;font-size:0.85rem;">Already have an account? <a href="#" onclick="toggleClientReg();return false;" style="color:var(--teal);">Sign In</a></p>
+        </form>
+      </div>
+    </div>
+    <!-- Admin Panel Content -->
+    <div class="admin-panel-inner" id="admin-panel-inner">
+      <div class="dash-header">
+        <div class="dash-greeting">
+          <div class="welcome-text">Admin Dashboard</div>
+          <h2 style="font-family:var(--font-display);font-size:2rem;color:var(--teal);" data-i18n="admin.panelTitle">Review & Manage Submissions</h2>
+        </div>
+        <button type="button" class="btn-secondary" onclick="logOut()" data-i18n="btn.adminLogout">Sign Out</button>
+      </div>
+      <div class="admin-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:1.5rem;">
+        <div style="background:#f8fffe;border:1px solid #e0f0ee;border-radius:10px;padding:1rem;text-align:center;"><div style="font-size:0.78rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;">Total Businesses</div><div id="st-tb" style="font-size:2rem;font-weight:700;color:var(--teal);">0</div></div>
+        <div style="background:#f8fffe;border:1px solid #e0f0ee;border-radius:10px;padding:1rem;text-align:center;"><div style="font-size:0.78rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;">Approved</div><div id="st-ab" style="font-size:2rem;font-weight:700;color:#2e7d32;">0</div></div>
+        <div style="background:#f8fffe;border:1px solid #e0f0ee;border-radius:10px;padding:1rem;text-align:center;"><div style="font-size:0.78rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;">Customers</div><div id="st-tc" style="font-size:2rem;font-weight:700;color:#1565c0;">0</div></div>
+        <div style="background:#f8fffe;border:1px solid #e0f0ee;border-radius:10px;padding:1rem;text-align:center;"><div style="font-size:0.78rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;">Services</div><div id="st-ts" style="font-size:2rem;font-weight:700;color:#6a1b9a;">0</div></div>
+      </div>
+      <canvas id="adminChart" style="max-height:200px;margin-bottom:1.5rem;"></canvas>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="showAdminTab('pending', this)">
+          <span data-i18n="tab.pending">Pending Review</span>
+          <span class="badge-count" id="pending-count-badge">0</span>
+        </button>
+        <button class="admin-tab" onclick="showAdminTab('approved', this)">
+          <span data-i18n="tab.approved">Approved</span>
+          <span class="badge-count" id="approved-count-badge" style="background:var(--green);">0</span>
+        </button>
+        <button class="admin-tab" onclick="showAdminTab('rejected', this)">
+          <span data-i18n="tab.rejected">Rejected</span>
+          <span class="badge-count" id="rejected-count-badge" style="background:var(--ink2);">0</span>
+        </button>
+        <button class="admin-tab" onclick="showAdminTab('categories', this)">
+          <span>Manage Categories 🏷️</span>
+        </button>
+      </div>
+      <div id="admin-tab-content" class="submissions-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD/EDIT SERVICE MODAL ===== -->
+<div class="modal-overlay" id="service-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="service-modal-title" data-i18n="modal.addService">Add New Service</h3>
+      <button class="modal-close" onclick="closeServiceModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="grid-template-columns:1fr;">
+        <div class="form-field">
+          <label data-i18n="form.serviceName">Service Name <span class="required">*</span></label>
+          <input type="text" id="svc-name" placeholder="Web Design Package" />
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.serviceDesc">Description <span class="required">*</span></label>
+          <textarea id="svc-desc" placeholder="Describe the service you offer..."></textarea>
+        </div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="form-field">
+            <label data-i18n="form.price">Price (₹) <span class="required">*</span></label>
+            <input type="number" id="svc-price" placeholder="5000" min="0" />
+          </div>
+          <div class="form-field">
+            <label data-i18n="form.priceType">Price Type</label>
+            <select id="svc-price-type">
+              <option value="fixed">Fixed</option>
+              <option value="hourly">Per Hour</option>
+              <option value="monthly">Monthly</option>
+              <option value="negotiable">Negotiable</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.serviceCategory">Category</label>
+          <select id="svc-category">
+            <option>Technology</option><option>Design</option><option>Education</option>
+            <option>Food & Beverage</option><option>Health & Wellness</option>
+            <option>Finance</option><option>Retail</option><option>Manufacturing</option>
+            <option>Agriculture</option><option>Transport</option>
+            <option>Consulting</option><option>Events</option>
+            <option>Real Estate</option><option>Legal Services</option><option>Beauty & Spa</option>
+            <option>Fitness & Sports</option><option>Home Services</option>
+            <option>Automotive</option><option>Pets</option><option>Entertainment</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Service Image (optional)</label>
+          <input type="file" id="svc-image" accept="image/*" style="font-size:0.85rem;" />
+        </div>
+        <div class="form-field">
+          <label data-i18n="form.serviceEmoji">Icon / Emoji</label>
+          <input type="text" id="svc-emoji" placeholder="🛠️" maxlength="4" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeServiceModal()" data-i18n="btn.cancel">Cancel</button>
+        <button class="btn-submit" onclick="saveService()" data-i18n="btn.saveService">Save Service</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="detail-modal-title">Business Details</h3>
+      <button class="modal-close" onclick="document.getElementById('detail-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-modal-body"></div>
+  </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toast-container"></div>
+
+<!-- Single Product Modal -->
+<div id="product-modal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 id="product-modal-title">Add New Product</h3>
+      <button class="btn-close" onclick="closeProductModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field span2">
+          <label>Product Name</label>
+          <input type="text" id="prd-name" placeholder="E.g. Eco-friendly Water Bottle" />
+        </div>
+        <div class="form-field">
+          <label>Price (₹)</label>
+          <input type="number" id="prd-price" placeholder="499" />
+        </div>
+        <div class="form-field">
+          <label>Stock Quantity</label>
+          <input type="number" id="prd-stock" placeholder="50" />
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <input type="text" id="prd-category" placeholder="E.g. Electronics" />
+        </div>
+        <div class="form-field">
+          <label>Emoji Icon</label>
+          <input type="text" id="prd-emoji" placeholder="📦" />
+        </div>
+        <div class="form-field span2">
+          <label>Description</label>
+          <textarea id="prd-desc" placeholder="Describe your product..."></textarea>
+        </div>
+        <div class="form-field span2">
+          <label>Product Image</label>
+          <div class="upload-zone" onclick="document.getElementById('prd-image-input').click()">
+            <div id="prd-image-preview">📦 Click to upload image</div>
+            <input type="file" id="prd-image-input" hidden onchange="handleProductImage(this)" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeProductModal()">Cancel</button>
+      <button class="btn-submit" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Upload Modal -->
+<div id="bulk-modal" class="modal-overlay">
+  <div class="modal-container" style="max-width:500px">
+    <div class="modal-header">
+      <h3>Bulk Product Upload</h3>
+      <button class="btn-close" onclick="closeBulkModal()">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <p style="margin-bottom:1.5rem; color:var(--ink2)">Download our CSV template, fill it in, and upload it to add multiple products at once.</p>
+      <button class="btn-secondary" onclick="downloadCSVTemplate()" style="margin-bottom:2rem">📥 Download CSV Template</button>
+      
+      <div class="upload-zone" onclick="document.getElementById('bulk-csv-input').click()">
+        <div class="upload-icon">📄</div>
+        <p>Click to select CSV file</p>
+        <input type="file" id="bulk-csv-input" accept=".csv" hidden onchange="handleBulkUpload(this)" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REVIEW MODAL [Updated Phase 5] ===== -->
+<div id="review-modal" class="modal-overlay">
+  <div class="modal-container" style="max-width:450px;">
+    <div class="modal-header">
+      <h3>Leave a Review</h3>
+      <button class="btn-close" onclick="closeReviewModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Rating</label>
+        <div id="review-stars" style="font-size:1.8rem; cursor:pointer; color:var(--bg3); display:flex; gap:5px;">
+          <span class="star" onclick="setReviewRating(1)">★</span>
+          <span class="star" onclick="setReviewRating(2)">★</span>
+          <span class="star" onclick="setReviewRating(3)">★</span>
+          <span class="star" onclick="setReviewRating(4)">★</span>
+          <span class="star" onclick="setReviewRating(5)">★</span>
+        </div>
+        <input type="hidden" id="rev-rating" value="0" />
+      </div>
+      <div class="form-field">
+        <label>Comment</label>
+        <textarea id="rev-comment" style="height:100px;" placeholder="Share your experience with this service..."></textarea>
+      </div>
+      <div class="form-field">
+        <label>Add a Photo (optional)</label>
+        <input type="file" id="rev-image-input" accept="image/*" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeReviewModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Send Enquiry Modal [NEW Phase 5] -->
+
+<div id="enquiry-modal" class="modal-overlay">
+  <div class="modal-container" style="max-width:500px;">
+    <div class="modal-header">
+      <h3 id="enquiry-modal-title">Send Enquiry</h3>
+      <button class="btn-close" onclick="closeEnquiryModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Subject</label>
+          <input type="text" id="enq-subject" placeholder="E.g. Pricing enquiry for bulk order" />
+        </div>
+        <div class="form-field">
+          <label>Message</label>
+          <textarea id="enq-message" style="height:120px;" placeholder="Type your message here..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeEnquiryModal()">Cancel</button>
+      <button class="btn-submit" onclick="sendEnquiry()">Send Enquiry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Gallery Photo Modal [NEW Phase 5] -->
+<div id="gallery-modal" class="modal-overlay">
+  <div class="modal-container" style="max-width:400px;">
+    <div class="modal-header">
+      <h3>Add Gallery Photo</h3>
+      <button class="btn-close" onclick="closeGalleryModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Photo Caption</label>
+        <input type="text" id="gal-caption" placeholder="E.g. Our new office setup" />
+      </div>
+      <br/>
+      <div class="upload-zone" onclick="document.getElementById('gal-image-input').click()">
+        <div id="gal-image-preview">🖼️ Click to select photo</div>
+        <input type="file" id="gal-image-input" hidden onchange="handleGalleryImage(this)" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeGalleryModal()">Cancel</button>
+      <button class="btn-submit" onclick="uploadGalleryItem()">Upload</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+// MODULE: State Management
+// ============================================================
+const State = (() => {
+  const KEYS = { businesses: 'vh_businesses', services: 'vh_services', currentUser: 'vh_currentUser', adminLoggedIn: 'vh_adminIn', token: 'vh_token', products: 'vh_products' };
+  const load = k => { try { return JSON.parse(localStorage.getItem(k)) || null; } catch { return null; } };
+  const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+  return {
+    getBusinesses: () => load(KEYS.businesses) || [],
+    setBusinesses: v => save(KEYS.businesses, v),
+    saveBusinesses: v => save(KEYS.businesses, v),
+    getServices: () => load(KEYS.services) || [],
+    setServices: v => save(KEYS.services, v),
+    saveServices: v => save(KEYS.services, v),
+    getProducts: () => load(KEYS.products) || [],
+    setProducts: v => save(KEYS.products, v),
+    saveProducts: v => save(KEYS.products, v),
+    getCurrentUser: () => load(KEYS.currentUser),
+    saveCurrentUser: v => save(KEYS.currentUser, v),
+    getToken: () => localStorage.getItem(KEYS.token) || '',
+    saveToken: v => localStorage.setItem(KEYS.token, v),
+    clearCurrentUser: () => { localStorage.removeItem(KEYS.currentUser); localStorage.removeItem(KEYS.adminLoggedIn); localStorage.removeItem(KEYS.token); },
+    isAdminIn: () => load(KEYS.adminLoggedIn) === true,
+    setAdminIn: v => save(KEYS.adminLoggedIn, v)
+  };
+})();
+
+// Phase 5 Global State
+let currentDashTab = 'services';
+let currentBrowseMode = 'services';
+let activePublicBizId = null;
+
+// ============================================================
+// MODULE: i18n — Translations
+// ============================================================
+const i18n = (() => {
+  const strings = {
+    en: {
+      'nav.browse': 'Browse Services', 'nav.register': 'Register Business', 'nav.home': 'Home', 'nav.admin': 'Admin Panel',
+      'hero.tag': "India's Business Discovery Platform",
+      'hero.h1': 'Connect, Register, and <em>Grow</em> Your Business',
+      'hero.sub': 'Register your individual or collaborative business, get approved, and showcase your services to thousands of customers.',
+      'hero.cta1': 'Register Your Business', 'hero.cta2': 'Browse Services',
+      'hero.stat1': 'Registered Businesses', 'hero.stat2': 'Active Services', 'hero.stat3': 'Awaiting Review',
+      'features.label': 'How It Works', 'features.title': 'Built for Every Business',
+      'features.sub': 'From individual freelancers to multi-partner collaborations — we support every business structure.',
+      'feat1.title': 'Easy Registration', 'feat1.desc': 'Fill a structured form with your business details. Individual or collaborative — we support both models.',
+      'feat2.title': 'Admin Review', 'feat2.desc': 'Every submission goes through our quality review process. Once approved, you get instant access to your dashboard.',
+      'feat3.title': 'Manage Services', 'feat3.desc': 'Add, edit, and manage your service listings from your personal business dashboard.',
+      'feat4.title': 'Ranked Discovery', 'feat4.desc': 'Customers find services sorted by likes and engagement. The best services naturally rise to the top.',
+      'reg.label': 'Business Registration', 'reg.title': 'Register Your Business',
+      'reg.sub': 'Fill in your details below. Your submission will be reviewed and approved within 24 hours.',
+      'reg.type': 'Select Business Type',
+      'type.individual': 'Individual', 'type.individualDesc': 'Solo entrepreneur or freelancer operating independently.',
+      'type.collab': 'Collaborative', 'type.collabDesc': 'Partnership, firm, or group of co-founders working together.',
+      'reg.sec1': 'Primary Owner Information', 'reg.sec2': 'Business Details', 'reg.sec3': 'Business Partners', 'reg.sec4': 'Documents & Verification',
+      'reg.addPartner': 'Add Partner',
+      'form.email': 'Email Address', 'form.phone': 'Phone Number', 'form.bizName': 'Business Name',
+      'form.bizDesc': 'Business Description', 'form.city': 'City / Town', 'form.state': 'State',
+      'form.website': 'Website / Portfolio', 'form.gst': 'GST Number (if applicable)',
+      'form.category': 'Business Category', 'form.categoryHint': 'Select one or more categories',
+      'form.logo': 'Business Logo', 'form.uploadLogo': 'Click to upload your business logo',
+      'form.aadhaar': 'Aadhaar / ID Number', 'form.pan': 'PAN Number',
+      'form.terms': 'I agree to the Terms of Service and Privacy Policy. I confirm all information provided is accurate.',
+      'form.serviceName': 'Service Name', 'form.serviceDesc': 'Description', 'form.price': 'Price (₹)',
+      'form.priceType': 'Price Type', 'form.serviceCategory': 'Category', 'form.serviceEmoji': 'Icon / Emoji',
+      'btn.cancel': 'Cancel', 'btn.submit': 'Submit for Review', 'btn.logout': 'Sign Out',
+      'btn.addService': 'Add Service', 'btn.saveService': 'Save Service', 'btn.backHome': 'Back to Home',
+      'btn.adminLogout': 'Sign Out',
+      'pending.title': 'Application Submitted!', 'pending.sub1': 'Your business registration is under review.',
+      'pending.sub2': "We'll notify you via email once approved.",
+      'pending.admin': 'Admin demo:',
+      'step.submitted': 'Submitted', 'step.review': 'Under Review', 'step.approved': 'Approved', 'step.live': 'Live',
+      'dash.welcome': 'Welcome Back', 'dash.myServices': 'My Services',
+      'dash.totalServices': 'Total Services', 'dash.totalLikes': 'Total Likes', 'dash.totalComments': 'Comments',
+      'status.approved': 'Approved', 'status.pending': 'Pending Review', 'status.rejected': 'Rejected',
+      'empty.title': 'No Services Yet', 'empty.desc': 'Click "Add Service" to list your first offering.',
+      'browse.title': 'Discover Local Services', 'browse.sub': 'Explore services from verified businesses. Sort by likes or newest first.',
+      'browse.search': 'Search services...', 'browse.empty': 'No Services Available',
+      'browse.emptyDesc': 'Approved businesses will appear here once they add their services.',
+      'sort.likes': 'Most Liked', 'sort.comments': 'Most Discussed', 'sort.newest': 'Newest',
+      'filter.all': 'All',
+      'admin.title': 'Admin Panel', 'admin.sub': 'Enter credentials to access the review dashboard.',
+      'admin.login': 'Sign In to Admin', 'admin.panelTitle': 'Review & Manage Submissions',
+      'tab.pending': 'Pending Review', 'tab.approved': 'Approved', 'tab.rejected': 'Rejected',
+      'modal.addService': 'Add New Service',
+    },
+    hi: {
+      'nav.browse': 'सेवाएं देखें', 'nav.register': 'व्यवसाय पंजीकृत करें', 'nav.home': 'होम', 'nav.admin': 'एडमिन पैनल',
+      'hero.tag': 'भारत का व्यापार खोज मंच',
+      'hero.h1': 'जुड़ें, पंजीकृत करें, और <em>आगे बढ़ें</em>',
+      'hero.sub': 'अपना व्यक्तिगत या सहयोगी व्यवसाय पंजीकृत करें, अनुमोदन प्राप्त करें, और हज़ारों ग्राहकों तक पहुंचें।',
+      'hero.cta1': 'व्यवसाय पंजीकृत करें', 'hero.cta2': 'सेवाएं देखें',
+      'hero.stat1': 'पंजीकृत व्यवसाय', 'hero.stat2': 'सक्रिय सेवाएं', 'hero.stat3': 'समीक्षा में',
+      'features.label': 'यह कैसे काम करता है', 'features.title': 'हर व्यवसाय के लिए बनाया गया',
+      'features.sub': 'व्यक्तिगत फ्रीलांसर से लेकर बहु-साझेदार सहयोग तक — हम हर व्यापार संरचना का समर्थन करते हैं।',
+      'feat1.title': 'आसान पंजीकरण', 'feat1.desc': 'अपने व्यवसाय की जानकारी भरें। व्यक्तिगत या सहयोगी — दोनों मॉडल समर्थित हैं।',
+      'feat2.title': 'एडमिन समीक्षा', 'feat2.desc': 'प्रत्येक आवेदन हमारी समीक्षा प्रक्रिया से गुज़रता है। अनुमोदन के बाद डैशबोर्ड तक तुरंत पहुंच।',
+      'feat3.title': 'सेवाएं प्रबंधित करें', 'feat3.desc': 'अपने डैशबोर्ड से सेवाएं जोड़ें, संपादित करें और प्रबंधित करें।',
+      'feat4.title': 'रैंक्ड खोज', 'feat4.desc': 'ग्राहक लाइक्स और जुड़ाव के आधार पर छांटी गई सेवाएं पाते हैं।',
+      'reg.label': 'व्यवसाय पंजीकरण', 'reg.title': 'अपना व्यवसाय पंजीकृत करें',
+      'reg.sub': 'नीचे अपनी जानकारी भरें। आपका आवेदन 24 घंटों में समीक्षा किया जाएगा।',
+      'reg.type': 'व्यवसाय प्रकार चुनें',
+      'type.individual': 'व्यक्तिगत', 'type.individualDesc': 'स्वतंत्र रूप से काम करने वाले उद्यमी।',
+      'type.collab': 'सहयोगी', 'type.collabDesc': 'साझेदारी, फर्म या सह-संस्थापकों का समूह।',
+      'reg.sec1': 'मुख्य मालिक की जानकारी', 'reg.sec2': 'व्यवसाय विवरण', 'reg.sec3': 'व्यवसाय साझेदार', 'reg.sec4': 'दस्तावेज़ और सत्यापन',
+      'reg.addPartner': 'साझेदार जोड़ें',
+      'form.email': 'ईमेल पता', 'form.phone': 'फोन नंबर', 'form.bizName': 'व्यवसाय का नाम',
+      'form.bizDesc': 'व्यवसाय विवरण', 'form.city': 'शहर / कस्बा', 'form.state': 'राज्य',
+      'form.website': 'वेबसाइट / पोर्टफोलियो', 'form.gst': 'GST नंबर (यदि लागू हो)',
+      'form.category': 'व्यवसाय श्रेणी', 'form.categoryHint': 'एक या अधिक श्रेणियां चुनें',
+      'form.logo': 'व्यवसाय लोगो', 'form.uploadLogo': 'लोगो अपलोड करने के लिए क्लिक करें',
+      'form.aadhaar': 'आधार / ID नंबर', 'form.pan': 'PAN नंबर',
+      'form.terms': 'मैं सेवा की शर्तों और गोपनीयता नीति से सहमत हूँ। मैं पुष्टि करता/करती हूँ कि सभी जानकारी सटीक है।',
+      'form.serviceName': 'सेवा का नाम', 'form.serviceDesc': 'विवरण', 'form.price': 'मूल्य (₹)',
+      'form.priceType': 'मूल्य प्रकार', 'form.serviceCategory': 'श्रेणी', 'form.serviceEmoji': 'आइकन / इमोजी',
+      'btn.cancel': 'रद्द करें', 'btn.submit': 'समीक्षा के लिए जमा करें', 'btn.logout': 'साइन आउट',
+      'btn.addService': 'सेवा जोड़ें', 'btn.saveService': 'सेवा सहेजें', 'btn.backHome': 'होम पर वापस जाएं',
+      'btn.adminLogout': 'साइन आउट',
+      'pending.title': 'आवेदन जमा हो गया!', 'pending.sub1': 'आपका व्यवसाय पंजीकरण समीक्षा में है।',
+      'pending.sub2': 'अनुमोदन के बाद हम आपको ईमेल से सूचित करेंगे।',
+      'pending.admin': 'एडमिन डेमो:',
+      'step.submitted': 'जमा हुआ', 'step.review': 'समीक्षा में', 'step.approved': 'अनुमोदित', 'step.live': 'लाइव',
+      'dash.welcome': 'वापस स्वागत है', 'dash.myServices': 'मेरी सेवाएं',
+      'dash.totalServices': 'कुल सेवाएं', 'dash.totalLikes': 'कुल लाइक्स', 'dash.totalComments': 'टिप्पणियां',
+      'status.approved': 'अनुमोदित', 'status.pending': 'समीक्षा में', 'status.rejected': 'अस्वीकृत',
+      'empty.title': 'अभी कोई सेवा नहीं', 'empty.desc': '"सेवा जोड़ें" पर क्लिक करें।',
+      'browse.title': 'स्थानीय सेवाएं खोजें', 'browse.sub': 'सत्यापित व्यवसायों की सेवाएं देखें।',
+      'browse.search': 'सेवाएं खोजें...', 'browse.empty': 'कोई सेवा उपलब्ध नहीं',
+      'browse.emptyDesc': 'अनुमोदित व्यवसाय यहां दिखेंगे जब वे सेवाएं जोड़ेंगे।',
+      'sort.likes': 'सर्वाधिक लाइक', 'sort.comments': 'सर्वाधिक चर्चा', 'sort.newest': 'नवीनतम',
+      'filter.all': 'सभी',
+      'admin.title': 'एडमिन पैनल', 'admin.sub': 'समीक्षा डैशबोर्ड तक पहुंचने के लिए लॉगिन करें।',
+      'admin.login': 'एडमिन में साइन इन करें', 'admin.panelTitle': 'आवेदनों की समीक्षा करें',
+      'tab.pending': 'समीक्षा में', 'tab.approved': 'अनुमोदित', 'tab.rejected': 'अस्वीकृत',
+      'modal.addService': 'नई सेवा जोड़ें',
+    }
+  };
+  let lang = 'en';
+  return {
+    t: key => strings[lang][key] || strings.en[key] || key,
+    setLang: l => { lang = l; applyTranslations(); },
+    getLang: () => lang,
+  };
+})();
+
+// ============================================================
+// MODULE: View Router
+// ============================================================
+let currentView = 'home';
+async function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + viewId);
+  if (el) { el.classList.add('active'); currentView = viewId; }
+  // Nav active state
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (viewId === 'home') updateHomeStats();
+  if (viewId === 'dashboard') renderDashboard();
+  if (viewId === 'browse') renderBrowse();
+  if (viewId === 'admin') renderAdminPanel();
+  if (viewId === 'register') loadRegistrationCategories();
+  window.scrollTo(0, 0);
+}
+
+async function loadRegistrationCategories() {
+  const container = document.getElementById('reg-cat-tags');
+  if (!container) return;
+  try {
+    const res = await fetch('/api/admin/categories');
+    const categories = await res.json();
+    if (categories.length === 0) {
+      container.innerHTML = '<p style="font-size:0.8rem; color:var(--ink3);">No categories defined yet.</p>';
+      return;
+    }
+    container.innerHTML = categories.map(c => `
+      <span class="category-tag" onclick="toggleCategory('${c.name}', this)">${c.name}</span>
+    `).join('');
+  } catch (e) { console.error('Failed to load categories'); }
+}
+
+// ============================================================
+// MODULE: Language Switcher
+// ============================================================
+function switchLang(lang) {
+  document.documentElement.setAttribute('data-lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.langSwitch === lang));
+  i18n.setLang(lang);
+}
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = i18n.t(key);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    el.innerHTML = i18n.t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = i18n.t(el.getAttribute('data-i18n-placeholder'));
+  });
+}
+
+// ============================================================
+// MODULE: Home Stats
+// ============================================================
+function animateCount(el, target, duration = 1000) {
+  let start = 0;
+  const step = timestamp => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    el.textContent = Math.floor(progress * target);
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  };
+  requestAnimationFrame(step);
+}
+function updateHomeStats() {
+  const businesses = State.getBusinesses();
+  const services = State.getServices();
+  const pending = businesses.filter(b => b.status === 'pending').length;
+  const approved = businesses.filter(b => b.status === 'approved').length;
+  animateCount(document.getElementById('stat-businesses'), approved);
+  animateCount(document.getElementById('stat-services'), services.length);
+  animateCount(document.getElementById('stat-pending'), pending);
+
+  renderFeaturedCarousel();
+}
+
+function renderFeaturedCarousel() {
+  const carousel = document.getElementById('featured-carousel');
+  const featured = State.getBusinesses().filter(b => b.is_featured && b.status === 'approved');
+
+  if (featured.length === 0) {
+    carousel.innerHTML = '<p style="color:var(--ink3); padding:1rem;">Discovering talented businesses... Check back soon!</p>';
+    return;
+  }
+
+  carousel.innerHTML = featured.map(b => `
+    <div class="featured-card" onclick="renderPublicBiz('${b.id}')" style="min-width:280px; background:var(--white); border-radius:16px; padding:1.5rem; border:1px solid var(--bg3); box-shadow:var(--shadow-sm); cursor:pointer; flex-shrink:0; scroll-snap-align:start; transition:var(--transition);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:1rem;">
+        <div style="width:40px; height:40px; border-radius:8px; background:${b.color || 'var(--teal)'}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.1rem;">${(b.bizName || 'B')[0].toUpperCase()}</div>
+        <h4 style="margin:0; font-family:var(--font-display);">${b.bizName}</h4>
+      </div>
+      <p style="font-size:0.85rem; color:var(--ink2); margin-bottom:1rem; min-height:3em; line-height:1.5;">${b.bizDesc.slice(0, 100)}${b.bizDesc.length > 100 ? '...' : ''}</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--ink3);">
+        <span>📍 ${b.bizCity}</span>
+        <span style="color:var(--gold); font-weight:600;">View Profile →</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// MODULE: Registration Form
+// ============================================================
+let selectedType = 'individual';
+let selectedCategories = [];
+let partnerCount = 0;
+let editingServiceId = null;
+let editingProductId = null;
+let currentBrowseFilter = 'all';
+let currentSortMode = 'likes';
+// currentBrowseMode and currentDashTab are now declared in Phase 5 Global State block
+
+function selectType(type) {
+  selectedType = type;
+  document.querySelectorAll('.type-card').forEach(c => c.classList.toggle('selected', c.dataset.type === type));
+  const collabSec = document.getElementById('collab-section');
+  collabSec.classList.toggle('show', type === 'collaborative');
+}
+
+function toggleCategory(cat, el) {
+  const idx = selectedCategories.indexOf(cat);
+  if (idx === -1) { selectedCategories.push(cat); el.classList.add('selected'); }
+  else { selectedCategories.splice(idx, 1); el.classList.remove('selected'); }
+}
+
+function addPartner() {
+  partnerCount++;
+  const container = document.getElementById('partners-list');
+  const div = document.createElement('div');
+  div.className = 'partner-entry';
+  div.id = `partner-${partnerCount}`;
+  div.innerHTML = `
+    <div class="partner-header">
+      <span>Partner ${partnerCount}</span>
+      <button type="button" class="btn-remove" onclick="removePartner(${partnerCount})">Remove</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-field"><label>Full Name</label><input type="text" placeholder="Partner Name" /></div>
+      <div class="form-field"><label>Email</label><input type="email" placeholder="partner@email.com" /></div>
+      <div class="form-field"><label>Role / Designation</label><input type="text" placeholder="Co-founder, Director..." /></div>
+      <div class="form-field"><label>Equity Share (%)</label><input type="number" placeholder="50" min="0" max="100" /></div>
+    </div>`;
+  container.appendChild(div);
+}
+function removePartner(id) { document.getElementById(`partner-${id}`)?.remove(); }
+
+function handleLogoUpload(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { document.getElementById('logo-preview').textContent = '✅'; };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function validateField(fieldId, inputId, validator) {
+  const field = document.getElementById(`field-${fieldId}`);
+  const input = document.getElementById(inputId);
+  if (!field || !input) return true;
+  const valid = validator(input.value);
+  field.classList.toggle('error', !valid);
+  return valid;
+}
+
+document.getElementById('registration-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  let valid = true;
+  valid &= validateField('ownerFirst', 'ownerFirst', v => v.trim().length > 0);
+  valid &= validateField('ownerLast', 'ownerLast', v => v.trim().length > 0);
+  valid &= validateField('ownerEmail', 'ownerEmail', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+  valid &= validateField('ownerPhone', 'ownerPhone', v => v.trim().length >= 8);
+  valid &= validateField('password', 'password', v => v.length >= 6);
+  valid &= validateField('bizName', 'bizName', v => v.trim().length > 0);
+
+  if (selectedCategories.length === 0) {
+    document.getElementById('cat-error').style.display = 'block'; valid = false;
+  } else { document.getElementById('cat-error').style.display = 'none'; }
+  
+  const termsOk = document.getElementById('terms-check').checked;
+  document.getElementById('terms-error').style.display = termsOk ? 'none' : 'block';
+  if (!termsOk) valid = false;
+  
+  if (!valid) { showToast('Please fix the highlighted errors.', 'error'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+  try {
+    const formData = new FormData();
+    const id = 'BIZ_' + Date.now();
+    
+    formData.append('id', id);
+    formData.append('type', selectedType);
+    formData.append('ownerFirst', document.getElementById('ownerFirst').value);
+    formData.append('ownerLast', document.getElementById('ownerLast').value);
+    formData.append('ownerEmail', document.getElementById('ownerEmail').value);
+    formData.append('ownerPhone', document.getElementById('ownerPhone').value);
+    formData.append('password', document.getElementById('password').value);
+    formData.append('bizName', document.getElementById('bizName').value);
+    formData.append('bizDesc', document.getElementById('bizDesc').value);
+    formData.append('bizCity', document.getElementById('bizCity').value);
+    formData.append('bizState', document.getElementById('bizState').value);
+    formData.append('bizWebsite', document.getElementById('bizWebsite').value);
+    formData.append('bizGST', document.getElementById('bizGST').value);
+    formData.append('categories', JSON.stringify(selectedCategories));
+    formData.append('color', getRandomColor());
+    
+    const logoInput = document.getElementById('logoInput');
+    if (logoInput.files && logoInput.files[0]) {
+      formData.append('logo', logoInput.files[0]);
+    }
+
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+    document.getElementById('pending-ref-display').textContent = `REF: #${id}`;
+    showView('pending');
+    showToast('Application submitted successfully!', 'success');
+    updateNavUser();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit for Review';
+  }
+});
+
+// ============================================================
+// MODULE: Dashboard
+// ============================================================
+function renderDashboard() {
+  const user = State.getCurrentUser();
+  if (!user) { showView('home'); return; }
+  const businesses = State.getBusinesses();
+  const biz = businesses.find(b => b.id === user.bizId);
+  if (!biz) { showView('home'); return; }
+  document.getElementById('dash-biz-name').textContent = biz.bizName;
+  const badge = document.getElementById('dash-status-badge');
+  badge.className = `status-badge ${biz.status}`;
+  document.getElementById('dash-status-text').textContent = { approved: 'Approved', pending: 'Pending Review', rejected: 'Rejected' }[biz.status];
+  document.getElementById('stat-biz-type').textContent = biz.type === 'individual' ? '👤 Individual' : '🤝 Collab';
+  
+  const services = State.getServices().filter(s => s.bizId === biz.id);
+  const products = State.getProducts().filter(p => p.bizId === biz.id);
+
+  document.getElementById('stat-total-services').textContent = services.length;
+  document.getElementById('stat-total-likes').textContent = services.reduce((a, s) => a + (s.likes || 0), 0);
+  document.getElementById('stat-total-comments').textContent = services.reduce((a, s) => a + (s.comments || 0), 0);
+  
+  // Render services
+  const servicesGrid = document.getElementById('dash-services-grid');
+  if (services.length === 0) {
+    servicesGrid.innerHTML = `<div class="empty-services"><div class="empty-icon">🛍️</div><h4>No Services Yet</h4><p>Click "Add Service" to list your first offering.</p></div>`;
+  } else {
+    servicesGrid.innerHTML = services.map(s => renderServiceCard(s, true)).join('');
+  }
+
+  // Render products
+  const productsGrid = document.getElementById('dash-products-grid');
+  if (products.length === 0) {
+    productsGrid.innerHTML = `<div class="empty-services"><div class="empty-icon">📦</div><h4>No Products Yet</h4><p>Click "Add Product" to list your first item.</p></div>`;
+  } else {
+    productsGrid.innerHTML = products.map(p => renderProductCard(p, true)).join('');
+  }
+
+  // Ensure correct tab is shown
+  switchDashTab(currentDashTab, document.querySelector(`.dash-tab[onclick*="${currentDashTab}"]`));
+}
+
+function switchDashTab(tabName, btn) {
+  currentDashTab = tabName;
+  document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.dash-tab-content').forEach(c => c.classList.remove('active'));
+  const content = document.getElementById(`dash-${tabName}-view`);
+  if (content) content.classList.add('active');
+
+  if (tabName === 'services') renderDashboardServices();
+  if (tabName === 'products') renderDashboardProducts();
+  if (tabName === 'leads') fetchAndRenderLeads();
+  if (tabName === 'gallery') fetchAndRenderGallery();
+  if (tabName === 'qr') renderBusinessQR();
+}
+
+async function fetchAndRenderLeads() {
+  const container = document.getElementById('dash-leads-list');
+  try {
+    const res = await fetch('/api/enquiries', {
+      headers: { 'Authorization': 'Bearer ' + State.getToken() }
+    });
+    const leads = await res.json();
+    if (!res.ok) throw new Error(leads.error);
+
+    if (leads.length === 0) {
+      container.innerHTML = '<p style="text-align:center; padding:2rem; color:var(--ink3);">No enquiries yet.</p>';
+      return;
+    }
+
+    container.innerHTML = leads.map(l => `
+      <div class="lead-item" style="background:var(--white); border:1px solid var(--bg3); border-radius:12px; padding:1.2rem; margin-bottom:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.8rem;">
+          <div>
+            <h4 style="margin:0; font-family:var(--font-display);">${l.subject}</h4>
+            <span style="font-size:0.8rem; color:var(--ink3);">${new Date(l.created_at).toLocaleString()}</span>
+          </div>
+          <span class="status-badge ${l.status === 'new' ? 'pending' : 'approved'}">${l.status.toUpperCase()}</span>
+        </div>
+        <p style="margin:0 0 1rem; color:var(--ink2); font-size:0.95rem;">${l.message}</p>
+        <div style="font-size:0.85rem; padding-top:0.8rem; border-top:1px solid var(--bg2); display:flex; justify-content:space-between; align-items:center;">
+          <span>From: <strong>${l.client_name}</strong> (${l.client_email})</span>
+          ${l.status === 'new' ? `<button class="btn-primary" style="padding:4px 10px; font-size:0.8rem;" onclick="markLeadRead('${l.id}')">Mark Read</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = `<p style="color:red; text-align:center;">Error: ${e.message}</p>`;
+  }
+}
+
+async function markLeadRead(id) {
+  try {
+    const res = await fetch(`/api/enquiries/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + State.getToken() },
+      body: JSON.stringify({ status: 'read' })
+    });
+    if (!res.ok) throw new Error('Update failed');
+    showToast('Lead marked as read', 'success');
+    fetchAndRenderLeads();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function fetchAndRenderGallery() {
+  const user = State.getCurrentUser();
+  const container = document.getElementById('dash-gallery-grid');
+  try {
+    const res = await fetch(`/api/gallery/${user.bizId}`);
+    const items = await res.json();
+    if (!res.ok) throw new Error(items.error);
+
+    if (items.length === 0) {
+      container.innerHTML = '<p style="text-align:center; padding:2rem; color:var(--ink3); grid-column:1/-1;">Your gallery is empty.</p>';
+      return;
+    }
+
+    container.innerHTML = items.map(im => `
+      <div class="gallery-item" style="position:relative; aspect-ratio:1; border-radius:12px; overflow:hidden; border:1px solid var(--bg3); box-shadow:var(--shadow-sm);">
+        <img src="${im.image_url}" style="width:100%; height:100%; object-fit:cover;" />
+        <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); color:#fff; padding:5px 8px; font-size:0.75rem;">${im.caption}</div>
+        <button onclick="deleteGalleryItem('${im.id}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.8); color:#fff; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer; font-weight:bold;">×</button>
+      </div>
+    `).join('');
+  } catch (e) { showToast('Error loading gallery', 'error'); }
+}
+
+function renderBusinessQR() {
+  const user = State.getCurrentUser();
+  const qrContainer = document.getElementById('qr-code-display');
+  qrContainer.innerHTML = '';
+  const profileUrl = window.location.origin + window.location.pathname + '#profile/' + user.bizId;
+  new QRCode(qrContainer, {
+    text: profileUrl,
+    width: 256,
+    height: 256,
+    colorDark: "#0d4040",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+
+function downloadBusinessQR() {
+  const canvas = document.querySelector('#qr-code-display canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL("image/png");
+  link.download = 'venturehub_business_qr.png';
+  link.click();
+}
+
+function buildServiceCard(s, isOwner = false) {
+  const bg = `linear-gradient(135deg, ${s.color || 'var(--teal)'} 0%, ${adjustColor(s.color || '#0d4040')} 100%)`;
+  return `<div class="service-card">
+    <div class="service-card-img" style="background:${bg}">
+      <span style="position:relative;z-index:1;font-size:3rem;">${s.emoji || '🛠️'}</span>
+      <div class="img-overlay"></div>
+    </div>
+    <div class="service-card-body">
+      <div class="service-tags">${(s.categories || [s.category]).map(c => `<span class="service-tag-pill">${c}</span>`).join('')}</div>
+      <h4>${s.name}</h4>
+      <p>${s.description}</p>
+    </div>
+    <div class="service-card-footer">
+      <div class="service-price"><span class="currency">₹</span>${Number(s.price).toLocaleString()} <span class="currency">${s.priceType || 'fixed'}</span></div>
+      <div class="service-metrics">
+        <span class="metric">❤️ ${s.likes || 0}</span>
+        <span class="metric">💬 ${s.comments || 0}</span>
+      </div>
+    </div>
+    ${isOwner ? `<div class="service-card-actions">
+      <button class="btn-edit" onclick="openEditServiceModal('${s.id}')">✏️ Edit</button>
+      <button class="btn-delete" onclick="deleteService('${s.id}')">🗑️ Delete</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function buildProductCard(p, isOwner = false) {
+  const bg = `linear-gradient(135deg, ${p.color || 'var(--ink1)'} 0%, ${adjustColor(p.color || '#333')} 100%)`;
+  return `<div class="service-card">
+    <div class="service-card-img" style="background:${bg};">
+      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;">` : ''}
+      <span style="position:relative;z-index:1;font-size:3rem;">${p.emoji || '📦'}</span>
+      <div class="img-overlay"></div>
+    </div>
+    <div class="service-card-body">
+      <div class="service-tags"><span class="service-tag-pill">${p.category}</span></div>
+      <h4>${p.name}</h4>
+      <p>${p.description}</p>
+    </div>
+    <div class="service-card-footer">
+      <div class="service-price"><span class="currency">₹</span>${Number(p.price).toLocaleString()}</div>
+      <div class="service-metrics">
+        <span class="metric">Stock: ${p.stock}</span>
+      </div>
+    </div>
+    ${isOwner ? `<div class="service-card-actions">
+      <button class="btn-edit" onclick="openEditProductModal('${p.id}')">✏️ Edit</button>
+      <button class="btn-delete" onclick="deleteProduct('${p.id}')">🗑️ Delete</button>
+    </div>` : ''}
+  </div>`;
+}
+
+// Alias for dashboard backwards compatibility
+function renderServiceCard(s, isOwner) { return buildServiceCard(s, isOwner); }
+function renderProductCard(p, isOwner) { return buildProductCard(p, isOwner); }
+
+// ============================================================
+// MODULE: Service Modal
+// ============================================================
+function openAddServiceModal() {
+  editingServiceId = null;
+  document.getElementById('service-modal-title').textContent = 'Add New Service';
+  ['svc-name','svc-desc','svc-price','svc-emoji'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('svc-price-type').value = 'fixed';
+  document.getElementById('service-modal').classList.add('open');
+}
+function openEditServiceModal(serviceId) {
+  const s = State.getServices().find(sv => sv.id === serviceId);
+  if (!s) return;
+  editingServiceId = serviceId;
+  document.getElementById('service-modal-title').textContent = 'Edit Service';
+  document.getElementById('svc-name').value = s.name;
+  document.getElementById('svc-desc').value = s.description;
+  document.getElementById('svc-price').value = s.price;
+  document.getElementById('svc-price-type').value = s.priceType || 'fixed';
+  document.getElementById('svc-category').value = s.category;
+  document.getElementById('svc-emoji').value = s.emoji || '';
+  document.getElementById('service-modal').classList.add('open');
+}
+function closeServiceModal() { document.getElementById('service-modal').classList.remove('open'); }
+
+async function saveService() {
+  const name = document.getElementById('svc-name').value.trim();
+  const desc = document.getElementById('svc-desc').value.trim();
+  const price = document.getElementById('svc-price').value;
+  if (!name || !desc || !price) { showToast('Please fill all required fields.', 'error'); return; }
+  
+  const user = State.getCurrentUser();
+  const token = State.getToken();
+  const biz = State.getBusinesses().find(b => b.id === user.bizId);
+
+  const payload = {
+    id: editingServiceId || 'svc_' + Date.now(),
+    bizId: user.bizId,
+    bizName: biz?.bizName || 'Unknown',
+    name,
+    description: desc,
+    price: Number(price),
+    priceType: document.getElementById('svc-price-type').value,
+    category: document.getElementById('svc-category').value,
+    categories: JSON.stringify([document.getElementById('svc-category').value]),
+    emoji: document.getElementById('svc-emoji').value || '🛠️',
+    color: biz?.color || getRandomColor(),
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const method = editingServiceId ? 'PUT' : 'POST';
+    const url = editingServiceId ? `/api/services/${editingServiceId}` : '/api/services';
+    
+    const res = await fetch(url, {
+      method,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to save service');
+
+    showToast(editingServiceId ? 'Service updated!' : 'Service added successfully!', 'success');
+    
+    await API.fetchServices();
+    closeServiceModal();
+    renderDashboard();
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, 'error');
+  }
+}
+
+async function deleteService(serviceId) {
+  if (!confirm('Delete this service?')) return;
+  const token = State.getToken();
+  
+  try {
+    const res = await fetch(`/api/services/${serviceId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    
+    if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete service');
+    }
+
+    showToast('Service deleted.', 'warning');
+    await API.fetchServices();
+    renderDashboard();
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, 'error');
+  }
+}
+
+// ============================================================
+// MODULE: Product Modal
+// ============================================================
+function openAddProductModal() {
+  editingProductId = null;
+  document.getElementById('product-modal-title').textContent = 'Add New Product';
+  ['prd-name', 'prd-price', 'prd-stock', 'prd-category', 'prd-emoji', 'prd-desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('prd-image-input').value = '';
+  document.getElementById('prd-image-preview').innerHTML = '📦 Click to upload image';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function openEditProductModal(productId) {
+  const p = State.getProducts().find(prod => prod.id === productId);
+  if (!p) return;
+  editingProductId = productId;
+  document.getElementById('product-modal-title').textContent = 'Edit Product';
+  document.getElementById('prd-name').value = p.name;
+  document.getElementById('prd-price').value = p.price;
+  document.getElementById('prd-stock').value = p.stock;
+  document.getElementById('prd-category').value = p.category;
+  document.getElementById('prd-emoji').value = p.emoji || '';
+  document.getElementById('prd-desc').value = p.description;
+  document.getElementById('prd-image-input').value = ''; // Clear file input
+  document.getElementById('prd-image-preview').innerHTML = p.imageUrl ? `<img src="${p.imageUrl}" style="max-width:100px;max-height:100px;object-fit:contain;">` : '📦 Click to upload image';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeProductModal() {
+  document.getElementById('product-modal').classList.remove('open');
+}
+
+function handleProductImage(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('prd-image-preview').innerHTML = `<img src="${e.target.result}" style="max-width:100px;max-height:100px;object-fit:contain;">`;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function saveProduct() {
+  const name = document.getElementById('prd-name').value.trim();
+  const price = document.getElementById('prd-price').value;
+  const stock = document.getElementById('prd-stock').value;
+  const category = document.getElementById('prd-category').value.trim();
+  const desc = document.getElementById('prd-desc').value.trim();
+
+  if (!name || !price || !stock || !category || !desc) {
+    showToast('Please fill all required fields for the product.', 'error');
+    return;
+  }
+
+  const user = State.getCurrentUser();
+  const token = State.getToken();
+  const biz = State.getBusinesses().find(b => b.id === user.bizId);
+
+  const formData = new FormData();
+  formData.append('id', editingProductId || 'prd_' + Date.now());
+  formData.append('bizId', user.bizId);
+  formData.append('bizName', biz?.bizName || 'Unknown');
+  formData.append('name', name);
+  formData.append('description', desc);
+  formData.append('price', Number(price));
+  formData.append('stock', Number(stock));
+  formData.append('category', category);
+  formData.append('emoji', document.getElementById('prd-emoji').value || '📦');
+  formData.append('color', biz?.color || getRandomColor());
+  formData.append('createdAt', new Date().toISOString());
+
+  const imageInput = document.getElementById('prd-image-input');
+  if (imageInput.files && imageInput.files[0]) {
+    formData.append('image', imageInput.files[0]);
+  }
+
+  try {
+    const method = editingProductId ? 'PUT' : 'POST';
+    const url = editingProductId ? `/api/products/${editingProductId}` : '/api/products';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to save product');
+
+    showToast(editingProductId ? 'Product updated!' : 'Product added successfully!', 'success');
+
+    await API.fetchProducts();
+    closeProductModal();
+    renderDashboard();
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, 'error');
+  }
+}
+
+async function deleteProduct(productId) {
+  if (!confirm('Delete this product?')) return;
+  const token = State.getToken();
+
+  try {
+    const res = await fetch(`/api/products/${productId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to delete product');
+    }
+
+    showToast('Product deleted.', 'warning');
+    await API.fetchProducts();
+    renderDashboard();
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, 'error');
+  }
+}
+
+// ============================================================
+// MODULE: Gallery & Enquiries [NEW Phase 5]
+// ============================================================
+let galleryImageFile = null;
+
+function openAddGalleryModal() {
+  galleryImageFile = null;
+  document.getElementById('gal-caption').value = '';
+  document.getElementById('gal-image-input').value = '';
+  document.getElementById('gal-image-preview').innerHTML = '🖼️ Click to select photo';
+  document.getElementById('gallery-modal').classList.add('open');
+}
+
+function closeGalleryModal() {
+  document.getElementById('gallery-modal').classList.remove('open');
+}
+
+function handleGalleryImage(input) {
+  if (input.files && input.files[0]) {
+    galleryImageFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('gal-image-preview').innerHTML = `<img src="${e.target.result}" style="max-width:100%; max-height:150px; object-fit:contain;">`;
+    };
+    reader.readAsDataURL(galleryImageFile);
+  }
+}
+
+async function uploadGalleryItem() {
+  if (!galleryImageFile) { showToast('Please select a photo.', 'error'); return; }
+  const caption = document.getElementById('gal-caption').value.trim();
+  const token = State.getToken();
+
+  const formData = new FormData();
+  formData.append('image', galleryImageFile);
+  formData.append('caption', caption);
+
+  try {
+    const res = await fetch('/api/gallery', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    showToast('Photo added to gallery', 'success');
+    closeGalleryModal();
+    fetchAndRenderGallery();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function deleteGalleryItem(id) {
+  if (!confirm('Remove this photo from your gallery?')) return;
+  try {
+    const res = await fetch(`/api/gallery/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + State.getToken() }
+    });
+    if (!res.ok) throw new Error('Delete failed');
+    showToast('Photo removed', 'warning');
+    fetchAndRenderGallery();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// Enquiry Functions
+let activeEnquiryBizId = null;
+
+function openEnquiryModal(bizId, bizName) {
+  activeEnquiryBizId = bizId;
+  document.getElementById('enquiry-modal-title').textContent = `Enquire with ${bizName}`;
+  document.getElementById('enq-subject').value = '';
+  document.getElementById('enq-message').value = '';
+  document.getElementById('enquiry-modal').classList.add('open');
+}
+
+function closeEnquiryModal() {
+  document.getElementById('enquiry-modal').classList.remove('open');
+}
+
+async function sendEnquiry() {
+  const subject = document.getElementById('enq-subject').value.trim();
+  const message = document.getElementById('enq-message').value.trim();
+  if (!subject || !message) { showToast('Please fill all fields', 'error'); return; }
+
+  const token = State.getToken();
+  if (!token) { showToast('Please login to send enquiries', 'warning'); showView('admin'); return; }
+
+  try {
+    const res = await fetch('/api/enquiries', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token 
+      },
+      body: JSON.stringify({ business_id: activeEnquiryBizId, subject, message })
+    });
+    if (!res.ok) throw new Error('Failed to send enquiry');
+    showToast('Enquiry sent successfully!', 'success');
+    closeEnquiryModal();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+// Review Functions [NEW Phase 5]
+let activeReviewServiceId = null;
+
+function openReviewModal(serviceId) {
+  const token = State.getToken();
+  if (!token) return showToast('Please login to write reviews', 'warning');
+  
+  activeReviewServiceId = serviceId;
+  document.getElementById('rev-rating').value = '0';
+  document.getElementById('rev-comment').value = '';
+  document.getElementById('rev-image-input').value = '';
+  setReviewRating(0);
+  document.getElementById('review-modal').classList.add('open');
+}
+
+function closeReviewModal() {
+  document.getElementById('review-modal').classList.remove('open');
+}
+
+function setReviewRating(rating) {
+  document.getElementById('rev-rating').value = rating;
+  const stars = document.querySelectorAll('#review-stars .star');
+  stars.forEach((s, i) => {
+    s.style.color = i < rating ? 'var(--gold)' : 'var(--bg3)';
+  });
+}
+
+async function submitReview() {
+  const rating = document.getElementById('rev-rating').value;
+  const comment = document.getElementById('rev-comment').value.trim();
+  const imageInput = document.getElementById('rev-image-input');
+  
+  if (rating === '0') return showToast('Please select a star rating', 'error');
+
+  const formData = new FormData();
+  formData.append('rating', rating);
+  formData.append('comment', comment);
+  if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
+
+  try {
+    const res = await fetch(`/api/services/${activeReviewServiceId}/reviews`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + State.getToken() },
+      body: formData
+    });
+    if (!res.ok) throw new Error('Failed to submit review');
+    showToast('Review submitted! Thank you.', 'success');
+    closeReviewModal();
+    renderBrowse();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+function openBulkUploadModal() {
+  document.getElementById('bulk-modal').classList.add('open');
+}
+
+function closeBulkModal() {
+  document.getElementById('bulk-modal').classList.remove('open');
+}
+
+function downloadCSVTemplate() {
+  const csvContent = "data:text/csv;charset=utf-8,"
+    + "name,description,price,stock,category,emoji,imageUrl\n"
+    + "Example Product,A fantastic example product,199,100,Electronics,💡,https://example.com/image.jpg\n";
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "product_template.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+async function handleBulkUpload(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const token = State.getToken();
+
+    const formData = new FormData();
+    formData.append('csv', file);
+
+    try {
+      const res = await fetch('/api/products/bulk', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Bulk upload failed');
+
+      showToast(data.message, 'success');
+      await API.fetchProducts();
+      closeBulkModal();
+      renderDashboard();
+    } catch (e) {
+      console.error(e);
+      showToast(e.message, 'error');
+    }
+  }
+}
+
+// ============================================================
+// MODULE: Browse / Customer View
+// ============================================================
+function renderBrowse() {
+  const businesses = State.getBusinesses().filter(b => b.status === 'approved');
+  const bizIds = new Set(businesses.map(b => b.id));
+  
+  let items = [];
+  if (currentBrowseMode === 'services') {
+    items = State.getServices().filter(s => bizIds.has(s.bizId));
+  } else { // products
+    items = State.getProducts().filter(p => bizIds.has(p.bizId));
+  }
+
+  const searchQ = (document.getElementById('browse-search')?.value || '').toLowerCase();
+  if (searchQ) items = items.filter(item => item.name.toLowerCase().includes(searchQ) || item.description.toLowerCase().includes(searchQ));
+  
+  if (currentBrowseFilter !== 'all') items = items.filter(item => item.category === currentBrowseFilter || (item.categories || []).includes(currentBrowseFilter));
+  
+  if (currentSortMode === 'likes' && currentBrowseMode === 'services') items.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+  else if (currentSortMode === 'comments' && currentBrowseMode === 'services') items.sort((a, b) => (b.comments || 0) - (a.comments || 0));
+  else items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  updateBrowseFilters();
+  const grid = document.getElementById('browse-grid');
+  if (items.length === 0) {
+    grid.innerHTML = `<div class="empty-services" style="grid-column:1/-1"><div class="empty-icon">🔍</div><h4>No ${currentBrowseMode} Available</h4><p>Approved businesses will appear here once they add their ${currentBrowseMode}.</p></div>`;
+    return;
+  }
+  grid.innerHTML = items.map((item, i) => {
+    if (currentBrowseMode === 'services') return renderBrowseCard(item, i + 1);
+    else return renderBrowseProductCard(item, i + 1);
+  }).join('');
+}
+
+function renderBrowseCard(s, rank) {
+  const biz = State.getBusinesses().find(b => b.id === s.bizId);
+  const bg = `linear-gradient(135deg, ${s.color || '#0d4040'}, ${adjustColor(s.color || '#0d4040')})`;
+  const isLiked = (s.likedBy || []).includes('guest');
+  return `<div class="browse-card">
+    <div class="browse-card-banner" style="background:${bg}">
+      ${rank <= 3 ? `<span class="rank-badge">#${rank} ${['🥇','🥈','🥉'][rank-1]}</span>` : ''}
+      <span style="font-size:3.5rem;position:relative;z-index:1;">${s.emoji || '🛠️'}</span>
+    </div>
+    <div class="browse-card-body">
+      <div class="browse-biz-info" onclick="renderPublicBiz('${s.bizId}')" style="cursor:pointer;">
+        <div class="biz-avatar" style="background:${biz?.color || '#0d4040'};">${(biz?.bizName || 'B')[0].toUpperCase()}</div>
+        <span class="biz-avatar-name" style="text-decoration:underline;">${biz?.bizName || 'Unknown Business'}</span>
+        <span class="verified-icon">✅</span>
+      </div>
+      <div class="service-tags">${(s.categories || [s.category]).map(c => `<span class="service-tag-pill">${c}</span>`).join('')}</div>
+      <h4>${s.name}</h4>
+      <p>${s.description}</p>
+    </div>
+    <div class="browse-card-footer">
+      <div class="browse-price">₹${Number(s.price).toLocaleString()} <span style="font-size:0.75rem;color:var(--ink3);">${s.priceType || 'fixed'}</span></div>
+      <div class="like-comment-group">
+        <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleServiceLike('${s.id}', this)" title="Like">
+          ${isLiked ? '❤️' : '🤍'} ${s.likes || 0}
+        </button>
+        <button class="action-btn" onclick="openReviewModal('${s.id}')" title="Review">💬 ${s.comments || 0}</button>
+        <button class="action-btn" onclick="openEnquiryModal('${biz?.id}', '${biz?.bizName}')" title="Enquire">📩</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function toggleServiceLike(serviceId, btn) {
+  const token = State.getToken();
+  if (!token) return showToast('Please login to like services', 'warning');
+
+  try {
+    const res = await fetch(`/api/services/${serviceId}/like`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to like');
+
+    showToast(data.liked ? 'Liked! ❤️' : 'Unliked', 'success');
+    await API.fetchServices();
+    renderBrowse();
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, 'error');
+  }
+}
+
+
+function renderBrowseProductCard(p, rank) {
+  const biz = State.getBusinesses().find(b => b.id === p.bizId);
+  const bg = `linear-gradient(135deg, ${p.color || '#0d4040'}, ${adjustColor(p.color || '#0d4040')})`;
+  return `<div class="browse-card">
+    <div class="browse-card-banner" style="background:${bg}">
+      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;">` : ''}
+      ${rank <= 3 ? `<span class="rank-badge">#${rank} ${['🥇','🥈','🥉'][rank-1]}</span>` : ''}
+      <span style="font-size:3.5rem;position:relative;z-index:1;">${p.emoji || '📦'}</span>
+    </div>
+    <div class="browse-card-body">
+      <div class="browse-biz-info" onclick="renderPublicBiz('${p.bizId}')" style="cursor:pointer;">
+        <div class="biz-avatar" style="background:${biz?.color || '#0d4040'};">${(biz?.bizName || 'B')[0].toUpperCase()}</div>
+        <span class="biz-avatar-name" style="text-decoration:underline;">${biz?.bizName || 'Unknown Business'}</span>
+        <span class="verified-icon">✅</span>
+      </div>
+      <div class="service-tags"><span class="service-tag-pill">${p.category}</span></div>
+      <h4>${p.name}</h4>
+      <p>${p.description}</p>
+    </div>
+    <div class="browse-card-footer">
+      <div class="browse-price">₹${Number(p.price).toLocaleString()}</div>
+      <div class="like-comment-group">
+         <span class="metric" style="margin-right:8px;">Stock: ${p.stock}</span>
+         <button class="action-btn" onclick="openEnquiryModal('${biz?.id}', '${biz?.bizName}')" title="Enquire">📩 Enquire</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setSortMode(mode, btn) {
+  currentSortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBrowse();
+}
+function setBrowseFilter(cat, el) {
+  currentBrowseFilter = cat;
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderBrowse();
+}
+function updateBrowseFilters() {
+  let categories = [];
+  if (currentBrowseMode === 'services') {
+    categories = [...new Set(State.getServices().map(s => s.category))];
+  } else { // products
+    categories = [...new Set(State.getProducts().map(p => p.category))];
+  }
+  
+  const container = document.getElementById('browse-filters');
+  const allActive = currentBrowseFilter === 'all';
+  container.innerHTML = `<span class="filter-tag ${allActive ? 'active' : ''}" data-filter="all" onclick="setBrowseFilter('all', this)" data-i18n="filter.all">All</span>` +
+    categories.map(c => `<span class="filter-tag ${currentBrowseFilter === c ? 'active' : ''}" onclick="setBrowseFilter('${c}', this)">${c}</span>`).join('');
+}
+
+function setBrowseMode(mode, btn) {
+  currentBrowseMode = mode;
+  document.querySelectorAll('.browse-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBrowse();
+}
+
+async function renderPublicBiz(bizId) {
+  const biz = State.getBusinesses().find(b => b.id === bizId);
+  if (!biz) return;
+
+  activePublicBizId = bizId;
+  showView('public-biz');
+
+  // Basic Info
+  document.getElementById('pub-biz-name').textContent = biz.bizName;
+  document.getElementById('pub-biz-desc').textContent = biz.bizDesc;
+  document.getElementById('pub-biz-loc').textContent = `📍 ${biz.bizCity}, ${biz.bizState}`;
+  document.getElementById('pub-biz-phone').textContent = `📞 ${biz.ownerPhone}`;
+  
+  const webLink = document.getElementById('pub-biz-web');
+  if (biz.bizWebsite) {
+    webLink.href = biz.bizWebsite.startsWith('http') ? biz.bizWebsite : 'https://' + biz.bizWebsite;
+    webLink.style.display = 'inline';
+  } else {
+    webLink.style.display = 'none';
+  }
+
+  // Avatar/Logo
+  const avatar = document.getElementById('pub-biz-avatar');
+  const logo = document.getElementById('pub-biz-logo');
+  if (biz.logoUrl) {
+    logo.src = biz.logoUrl;
+    logo.style.display = 'block';
+    avatar.style.display = 'none';
+  } else {
+    avatar.textContent = biz.bizName[0].toUpperCase();
+    avatar.style.background = biz.color || 'var(--teal)';
+    avatar.style.display = 'flex';
+    logo.style.display = 'none';
+  }
+
+  // Gallery [NEW Phase 5]
+  const galleryRes = await fetch(`/api/gallery/${bizId}`);
+  const galleryItems = await galleryRes.json();
+  const galleryContainer = document.getElementById('pub-biz-gallery');
+  if (galleryContainer) {
+    if (galleryItems.length > 0) {
+      galleryContainer.innerHTML = `
+        <h3 style="margin:2rem 0 1rem; font-family:var(--font-display);">Portfolio Gallery</h3>
+        <div class="public-gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:15px;">
+          ${galleryItems.map(im => `
+            <div class="gallery-photo" style="aspect-ratio:1; overflow:hidden; border-radius:12px; cursor:pointer;" onclick="viewFullImage('${im.image_url}')">
+              <img src="${im.image_url}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      galleryContainer.innerHTML = '';
+    }
+  }
+
+  // Offerings
+  renderPublicBizOfferings();
+  
+  // Add Enquiry Button to Profile Header
+  const headerActions = document.querySelector('#view-public-biz .header-actions');
+  if (headerActions) {
+    headerActions.innerHTML = `<button class="btn-submit" onclick="openEnquiryModal('${biz.id}', '${biz.bizName}')">📩 Send Message</button>`;
+  }
+}
+
+function renderPublicBizOfferings() {
+  const container = document.getElementById('pub-biz-services');
+  const services = State.getServices().filter(s => s.bizId === activePublicBizId);
+  const products = State.getProducts().filter(p => p.bizId === activePublicBizId);
+  
+  const items = currentBrowseMode === 'services' ? services : products;
+  
+  if (items.length === 0) {
+    container.innerHTML = `<p style="text-align:center; padding:2rem; color:var(--ink3);">No ${currentBrowseMode} listed yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = items.map(item => {
+    if (currentBrowseMode === 'services') return renderBrowseCard(item, 0);
+    else return renderBrowseProductCard(item, 0);
+  }).join('');
+}
+
+function viewFullImage(url) {
+  window.open(url, '_blank');
+}
+
+// ============================================================
+// MODULE: Admin Panel
+// ============================================================
+function renderAdminPanel() {
+  if (State.isAdminIn()) {
+    document.getElementById('admin-login-gate').style.display = 'none';
+    document.getElementById('admin-panel-inner').classList.add('show');
+    renderAdminSubmissions('pending');
+  } else {
+    document.getElementById('admin-login-gate').style.display = '';
+    document.getElementById('admin-panel-inner').classList.remove('show');
+  }
+}
+
+function adjustColor(hex, amt = -20) {
+  let usePound = false;
+  if (hex[0] === "#") { hex = hex.slice(1); usePound = true; }
+  let num = parseInt(hex, 16);
+  let r = (num >> 16) + amt;
+  if (r > 255) r = 255; else if (r < 0) r = 0;
+  let b = ((num >> 8) & 0x00FF) + amt;
+  if (b > 255) b = 255; else if (b < 0) b = 0;
+  let g = (num & 0x0000FF) + amt;
+  if (g > 255) g = 255; else if (g < 0) g = 0;
+  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+}
+function showAdminTab(status, btn) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderAdminSubmissions(status);
+}
+function renderAdminSubmissions(status) {
+  const container = document.getElementById('admin-tab-content');
+  const businesses = State.getBusinesses();
+
+  // Update badges
+  document.getElementById('pending-count-badge').textContent = businesses.filter(b => b.status === 'pending').length;
+  document.getElementById('approved-count-badge').textContent = businesses.filter(b => b.status === 'approved').length;
+  document.getElementById('rejected-count-badge').textContent = businesses.filter(b => b.status === 'rejected').length;
+
+  if (status === 'categories') {
+    renderAdminCategories(container);
+    return;
+  }
+
+  const filtered = businesses.filter(b => b.status === status);
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-services"><div class="empty-icon">${status === 'pending' ? '📭' : status === 'approved' ? '✅' : '🚫'}</div><h4>No ${status} submissions</h4><p>Nothing here yet.</p></div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(biz => `
+    <div class="submission-item" id="sub-${biz.id}" style="border:1px solid ${biz.is_featured ? 'var(--gold)' : 'var(--bg3)'}; position:relative;">
+      ${biz.is_featured ? `<span style="position:absolute; top:0; right:10px; background:var(--gold); color:#fff; font-size:0.6rem; padding:2px 6px; border-radius:0 0 4px 4px;">FEATURED</span>` : ''}
+      <div class="submission-avatar" style="background:${biz.color || 'var(--teal)'};">${(biz.bizName || 'B')[0].toUpperCase()}</div>
+      <div class="submission-info">
+        <h4>${biz.bizName}</h4>
+        <div class="sub-meta">
+          <span>👤 ${biz.ownerFirst} ${biz.ownerLast}</span>
+          <span>📍 ${biz.bizCity}, ${biz.bizState}</span>
+          <span>📅 ${new Date(biz.submittedAt).toLocaleDateString()}</span>
+        </div>
+      </div>
+      <div class="submission-actions">
+        <button class="btn-view-details" onclick="showBizDetail('${biz.id}')">View</button>
+        ${status === 'approved' ? `<button class="btn-primary" style="padding:4px 10px; font-size:0.8rem; background:${biz.is_featured ? 'var(--ink)' : 'var(--gold)'};" onclick="toggleFeatured('${biz.id}', ${!biz.is_featured})">${biz.is_featured ? '★ Unfeature' : '☆ Feature'}</button>` : ''}
+        ${status === 'pending' ? `<button class="btn-approve" onclick="updateBizStatus('${biz.id}','approved')">Approve ✓</button><button class="btn-reject" onclick="updateBizStatus('${biz.id}','rejected')">Reject ✗</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function renderAdminCategories(container) {
+  try {
+    const res = await fetch('/api/admin/categories');
+    const categories = await res.json();
+    
+    container.innerHTML = `
+      <div style="background:var(--white); border-radius:12px; padding:1.5rem; border:1px solid var(--bg3);">
+        <h4 style="margin-bottom:1rem;">Platform Categories</h4>
+        <div style="display:flex; gap:10px; margin-bottom:1.5rem;">
+          <input type="text" id="new-cat-name" placeholder="e.g. Healthcare" style="flex:1; padding:8px 12px; border:1px solid var(--bg3); border-radius:8px;">
+          <button class="btn-submit" onclick="addGlobalCategory()">+ Add Category</button>
+        </div>
+        <div id="global-cats-list" style="display:flex; flex-wrap:wrap; gap:10px;">
+          ${categories.map(c => `
+            <div class="category-tag-admin" style="display:flex; align-items:center; gap:8px; background:var(--bg2); padding:6px 14px; border-radius:100px; border:1px solid var(--bg3);">
+              <span>${c.name}</span>
+              <button onclick="deleteGlobalCategory('${c.id}')" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer;">×</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  } catch (e) { container.innerHTML = 'Failed to load categories'; }
+}
+
+async function addGlobalCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) return;
+  try {
+    const res = await fetch('/api/admin/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + State.getToken() },
+      body: JSON.stringify({ name })
+    });
+    if (!res.ok) throw new Error('Failed to add');
+    showToast('Category added', 'success');
+    renderAdminSubmissions('categories');
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function deleteGlobalCategory(id) {
+  if (!confirm('Delete this category?')) return;
+  try {
+    await fetch(`/api/admin/categories/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + State.getToken() }
+    });
+    renderAdminSubmissions('categories');
+  } catch (e) { showToast('Delete failed', 'error'); }
+}
+
+async function toggleFeatured(bizId, isFeatured) {
+  try {
+    const res = await fetch(`/api/admin/businesses/${bizId}/verify`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + State.getToken() },
+      body: JSON.stringify({ isVerified: true, isFeatured })
+    });
+    if (!res.ok) throw new Error('Update failed');
+    showToast(isFeatured ? 'Business Featured! ✨' : 'Feature removed', 'success');
+    await API.fetchBusinesses();
+    renderAdminSubmissions('approved');
+  } catch (e) { showToast(e.message, 'error'); }
+}
+async function updateBizStatus(bizId, newStatus) {
+  const isVerified = newStatus === 'approved';
+  try {
+    const res = await fetch(`/api/admin/businesses/${bizId}/verify`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + State.getToken() 
+      },
+      body: JSON.stringify({ isVerified })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to update status');
+
+    showToast(`Business ${newStatus}!`, isVerified ? 'success' : 'warning');
+    
+    // Refresh admin data
+    await API.fetchBusinesses();
+    renderAdminSubmissions(isVerified ? 'approved' : 'rejected');
+    loadStatsChart(); 
+  } catch (e) {
+    console.error(e);
+    showToast(e.message, 'error');
+  }
+}
+function showBizDetail(bizId) {
+  const biz = State.getBusinesses().find(b => b.id === bizId);
+  if (!biz) return;
+  document.getElementById('detail-modal-title').textContent = biz.bizName;
+  document.getElementById('detail-modal-body').innerHTML = `
+    <div style="display:grid;gap:10px;">
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Owner:</strong>${biz.ownerFirst} ${biz.ownerLast}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Email:</strong>${biz.ownerEmail}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Phone:</strong>${biz.ownerPhone}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Location:</strong>${biz.bizCity}, ${biz.bizState}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Type:</strong>${biz.type}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Categories:</strong>${biz.categories?.join(', ')}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Website:</strong>${biz.bizWebsite || 'N/A'}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">GST:</strong>${biz.bizGST || 'N/A'}</div>
+      <div style="display:flex;gap:8px;"><strong style="min-width:120px;color:var(--teal);">Status:</strong><span class="status-badge ${biz.status}" style="padding:2px 10px;">${biz.status}</span></div>
+      <div><strong style="color:var(--teal);">Description:</strong><p style="margin-top:6px;font-size:0.9rem;color:var(--ink2);">${biz.bizDesc}</p></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        ${biz.status === 'pending' ? `<button class="btn-approve" onclick="updateBizStatus('${biz.id}','approved');document.getElementById('detail-modal').classList.remove('open')">Approve ✓</button>
+        <button class="btn-reject" onclick="updateBizStatus('${biz.id}','rejected');document.getElementById('detail-modal').classList.remove('open')">Reject ✗</button>` : ''}
+      </div>
+    </div>`;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+// ============================================================
+// MODULE: Navigation / User Badge
+// ============================================================
+
+
+// ============================================================
+// MODULE: Toast
+// ============================================================
+
+
+
+// ============================================================
+// MODULE: API Helpers
+// ============================================================
+const API = {
+  fetchBusinesses: async () => {
+    try {
+      const res = await fetch('/api/admin/businesses', { headers: { 'Authorization': 'Bearer ' + State.getToken() } });
+      if (res.ok) State.setBusinesses(await res.json());
+    } catch (e) { console.error('fetchBusinesses err', e); }
+  },
+  fetchPublicBusinesses: async () => {
+    try {
+      const res = await fetch('/api/auth/businesses');
+      if (res.ok) State.setBusinesses(await res.json());
+    } catch (e) { console.error('fetchPublicBusinesses err', e); }
+  },
+  fetchServices: async () => {
+    try {
+      const res = await fetch('/api/services');
+      if (res.ok) State.setServices(await res.json());
+    } catch (e) { console.error('fetchServices err', e); }
+  },
+  fetchProducts: async () => {
+    try {
+      const res = await fetch('/api/products');
+      if (res.ok) State.setProducts(await res.json());
+    } catch (e) { console.error('fetchProducts err', e); }
+  },
+  fetchMe: async () => {
+    const token = State.getToken();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+      if (res.ok) {
+        const data = await res.json();
+        const user = State.getCurrentUser();
+        State.saveCurrentUser({ ...user, is_verified: data.is_verified });
+      }
+    } catch (e) { console.error('fetchMe err', e); }
+  }
+};
+
+// ============================================================
+// MODULE: Universal Login (Admin + Business + Client)
+// ============================================================
+async function universalLogin() {
+  const email = document.getElementById('admin-user').value.trim();
+  const password = document.getElementById('admin-pass').value;
+  if (!email || !password) return showToast('Please enter email and password', 'warning');
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) return showToast(data.error || 'Login failed', 'error');
+
+    State.saveToken(data.token);
+
+    if (data.role === 'admin') {
+      State.setAdminIn(true);
+      State.saveCurrentUser({ role: 'admin' });
+      document.getElementById('admin-login-gate').style.display = 'none';
+      document.getElementById('admin-panel-inner').classList.add('show');
+      await API.fetchBusinesses();
+      await API.fetchServices();
+      await API.fetchProducts();
+      renderAdminSubmissions('pending');
+      loadStatsChart();
+      showToast('Welcome, Admin! 🛡️', 'success');
+    } else if (data.role === 'business') {
+      State.saveCurrentUser({ role: 'business', bizId: data.bizId, is_verified: data.is_verified });
+      await API.fetchPublicBusinesses();
+      await API.fetchServices();
+      await API.fetchProducts();
+      if (data.is_verified) { showView('dashboard'); renderDashboard(); }
+      else showView('pending');
+      showToast('Welcome back! 🏢', 'success');
+    } else if (data.role === 'client') {
+      State.saveCurrentUser({ role: 'client', clientProfile: data.clientProfile });
+      document.getElementById('admin-login-gate').style.display = 'none';
+      showView('browse');
+      showToast('Welcome back! 👋', 'success');
+    }
+    updateNavUser();
+  } catch (e) { console.error(e); showToast('Network error: ' + e.message, 'error'); }
+}
+
+// ============================================================
+// MODULE: Client Registration
+// ============================================================
+function toggleClientReg() {
+  const loginForm = document.getElementById('login-form');
+  const regForm = document.getElementById('client-reg-form');
+  const isShowing = regForm.style.display === 'block';
+  regForm.style.display = isShowing ? 'none' : 'block';
+  loginForm.style.display = isShowing ? 'block' : 'none';
+  document.getElementById('gate-title').textContent = isShowing ? 'Login to Continue' : 'Create Customer Account';
+  document.getElementById('gate-sub').textContent = isShowing ? 'Sign in as Admin, Business, or Customer.' : 'Join VentureHub to like and review services.';
+}
+
+async function clientRegister() {
+  const firstName = document.getElementById('cr-first').value.trim();
+  const lastName = document.getElementById('cr-last').value.trim();
+  const email = document.getElementById('cr-email').value.trim();
+  const password = document.getElementById('cr-pass').value;
+  if (!firstName || !email || !password) return showToast('Please fill all required fields', 'warning');
+
+  try {
+    const res = await fetch('/api/auth/client-register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: 'CLIENT_' + Date.now(), firstName, lastName, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) return showToast(data.error || 'Registration failed', 'error');
+
+    State.saveToken(data.token);
+    State.saveCurrentUser({ role: 'client', clientProfile: { first_name: firstName, last_name: lastName } });
+    document.getElementById('admin-login-gate').style.display = 'none';
+    await API.fetchServices();
+    await API.fetchProducts();
+    showView('browse');
+    updateNavUser();
+    showToast('Account created! Start exploring services 🎉', 'success');
+  } catch (e) { showToast('Network error: ' + e.message, 'error'); }
+}
+
+// ============================================================
+// MODULE: Admin Charts
+// ============================================================
+let adminChartInstance = null;
+async function loadStatsChart() {
+  try {
+    const res = await fetch('/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + State.getToken() } });
+    if (!res.ok) return;
+    const stats = await res.json();
+
+    document.getElementById('st-tb').textContent = stats.totalBusinesses;
+    document.getElementById('st-ab').textContent = stats.approvedBusinesses;
+    document.getElementById('st-tc').textContent = stats.totalClients;
+    document.getElementById('st-ts').textContent = stats.totalServices;
+
+    if (typeof Chart === 'undefined') return;
+    const ctx = document.getElementById('adminChart').getContext('2d');
+    if (adminChartInstance) adminChartInstance.destroy();
+    adminChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Businesses', 'Approved', 'Clients', 'Services', 'Likes'],
+        datasets: [{
+          label: 'Platform Metrics',
+          data: [stats.totalBusinesses, stats.approvedBusinesses, stats.totalClients, stats.totalServices, stats.totalLikes],
+          backgroundColor: ['#0d4040', '#2e7d32', '#1565c0', '#6a1b9a', '#b71c1c'],
+          borderRadius: 6
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+  } catch (e) { console.error('Error loading stats', e); }
+}
+
+// ============================================================
+// MODULE: Public Business Profile Page
+// ============================================================
+async function renderPublicBiz(bizId) {
+  const biz = State.getBusinesses().find(b => b.id === bizId);
+  if (!biz) return showToast('Business not found', 'error');
+
+  document.getElementById('pub-biz-name').textContent = biz.bizName;
+  document.getElementById('pub-biz-desc').textContent = biz.bizDesc || 'No description provided.';
+  document.getElementById('pub-biz-loc').textContent = `📍 ${biz.bizCity || ''}, ${biz.bizState || ''}`;
+  document.getElementById('pub-biz-phone').textContent = `📞 ${biz.ownerPhone || ''}`;
+  const logoEl = document.getElementById('pub-biz-logo');
+  logoEl.src = biz.logoUrl || '';
+  logoEl.style.display = biz.logoUrl ? 'block' : 'none';
+  const webEl = document.getElementById('pub-biz-web');
+  if (biz.website) { webEl.href = biz.website; webEl.style.display = 'inline'; }
+  else webEl.style.display = 'none';
+  const publicAvatar = document.getElementById('pub-biz-avatar');
+  if (publicAvatar) { publicAvatar.textContent = biz.bizName[0].toUpperCase(); publicAvatar.style.background = biz.color || 'var(--ink1)'; }
+
+  const services = State.getServices().filter(s => s.bizId === biz.id);
+  const products = State.getProducts().filter(p => p.bizId === biz.id);
+  const container = document.getElementById('pub-biz-services');
+
+  // Render based on currentBrowseMode for public profile
+  if (currentBrowseMode === 'services') {
+    if (services.length === 0) {
+      container.innerHTML = '<p style="color:var(--ink3);text-align:center;padding:2rem;">No services listed yet.</p>';
+    } else {
+      container.innerHTML = services.map(s => buildServiceCard(s)).join('');
+    }
+  } else { // products
+    if (products.length === 0) {
+      container.innerHTML = '<p style="color:var(--ink3);text-align:center;padding:2rem;">No products listed yet.</p>';
+    } else {
+      container.innerHTML = products.map(p => buildProductCard(p)).join('');
+    }
+  }
+
+  // Set active state for public profile tabs
+  document.querySelectorAll('#view-public-biz .browse-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#view-public-biz .browse-tab-btn[onclick*="${currentBrowseMode}"]`).classList.add('active');
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-public-biz').classList.add('active');
+}
+
+// ============================================================
+// MODULE: Reviews
+// ============================================================
+async function handleReviewSubmit(sId) {
+  const user = State.getCurrentUser();
+  if (!user || user.role !== 'client') {
+    showView('admin');
+    return showToast('Please sign in as a Customer to leave a review', 'warning');
+  }
+  const rating = parseInt(prompt('Rate this service from 1 to 5 stars:\n⭐ 1 = Poor  ⭐⭐⭐⭐⭐ 5 = Excellent', '5'));
+  if (!rating || rating < 1 || rating > 5) return showToast('Invalid rating (must be 1-5)', 'error');
+  const comment = prompt('Leave a review comment (optional):');
+
+  try {
+    const res = await fetch(`/api/services/${sId}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + State.getToken() },
+      body: JSON.stringify({ rating, comment: comment || '' })
+    });
+    if (res.ok) {
+      showToast(`Review submitted! You rated it ${'⭐'.repeat(rating)}`, 'success');
+      await API.fetchServices();
+      renderBrowse();
+    } else {
+      const err = await res.json();
+      showToast(err.error || 'Failed to submit review', 'error');
+    }
+  } catch (e) { showToast('Network error', 'error'); }
+}
+
+async function toggleLike(btn, sId) {
+  const user = State.getCurrentUser();
+  if (!user || user.role !== 'client') {
+    showView('admin');
+    return showToast('Please sign in as a Customer to like services', 'warning');
+  }
+  const srv = State.getServices().find(s => s.id === sId);
+  if (!srv) return;
+  const liked = (srv.likedBy || []).includes(user.id || 'guest');
+  try {
+    const res = await fetch(`/api/services/${sId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: liked ? 'unlike' : 'like', userId: user.id || 'guest' })
+    });
+    if (res.ok) { await API.fetchServices(); renderBrowse(); }
+  } catch (e) { console.error('Like error', e); }
+}
+
+// ============================================================
+// MODULE: Navigation / User Badge
+// ============================================================
+function updateNavUser() {
+  const user = State.getCurrentUser();
+  const area = document.getElementById('nav-user-area');
+
+  if (State.isAdminIn()) {
+    area.innerHTML = `<div class="user-badge" onclick="showView('admin')" style="cursor:pointer;">
+      <div class="avatar" style="background:var(--ink1);">A</div>
+      <span>Admin Panel</span>
+    </div>`;
+    return;
+  }
+
+  if (user) {
+    if (user.role === 'client') {
+      const name = user.clientProfile ? user.clientProfile.first_name || 'Customer' : 'Customer';
+      area.innerHTML = `<div class="user-badge" onclick="showView('browse')" style="cursor:pointer;">
+        <div class="avatar" style="background:#1565c0;">${name[0].toUpperCase()}</div>
+        <span>${name}</span>
+        <button onclick="logOut()" style="margin-left:8px;background:none;border:1px solid var(--ink3);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:0.75rem;">Sign out</button>
+      </div>`;
+      return;
+    }
+    if (user.bizId) {
+      const biz = State.getBusinesses().find(b => b.id === user.bizId);
+      if (biz) {
+        const target = biz.status === 'approved' ? 'dashboard' : 'pending';
+        area.innerHTML = `<div class="user-badge" onclick="showView('${target}')" style="cursor:pointer;">
+          <div class="avatar" style="background:${biz.color || 'var(--ink1)'}">${biz.bizName[0].toUpperCase()}</div>
+          <span>${biz.bizName}</span>
+          <span class="status-badge ${biz.status}" style="padding:2px 8px;font-size:0.72rem;">${biz.status}</span>
+        </div>`;
+        return;
+      }
+    }
+  }
+  area.innerHTML = '<button class="nav-link" onclick="showView(\'admin\')" data-i18n="nav.admin">Login</button>';
+}
+function logOut() { State.clearCurrentUser(); showView('home'); updateNavUser(); showToast('Signed out. 👋', 'warning'); }
+function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('open'); }
+function closeMobileNav() { document.getElementById('mobile-nav').classList.remove('open'); }
+
+// ============================================================
+// MODULE: Toast
+// ============================================================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.animation = 'toastOut 0.3s ease forwards'; setTimeout(() => toast.remove(), 300); }, 3200);
+}
+
+// ============================================================
+// MODULE: Utilities
+// ============================================================
+const COLORS = ['#0d4040','#1a5c5c','#2a6060','#3d5a80','#4a3060','#6b3a2a','#2a4a1a','#3a2a6b'];
+function getRandomColor() { return COLORS[Math.floor(Math.random() * COLORS.length)]; }
+function adjustColor(hex) {
+  try {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return `#${Math.min(r+30,255).toString(16).padStart(2,'0')}${Math.min(g+30,255).toString(16).padStart(2,'0')}${Math.min(b+30,255).toString(16).padStart(2,'0')}`;
+  } catch { return hex; }
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+function seedDemoData() {} // All data now comes from the SQLite API
+
+// ============================================================
+// MODULE: Init
+// ============================================================
+async function init() {
+  const user = State.getCurrentUser();
+  const token = State.getToken();
+  
+  if (token) await API.fetchMe();
+  
+  if (State.isAdminIn()) {
+    await API.fetchBusinesses();
+  } else {
+    await API.fetchPublicBusinesses();
+  }
+  await API.fetchServices();
+  await API.fetchProducts();
+  updateNavUser();
+  updateHomeStats();
+  
+  if (State.isAdminIn()) {
+    document.getElementById('admin-login-gate').style.display = 'none';
+    document.getElementById('admin-panel-inner').classList.add('show');
+  }
+  
+  const updatedUser = State.getCurrentUser();
+  if (updatedUser && updatedUser.bizId) {
+    const biz = State.getBusinesses().find(b => b.id === updatedUser.bizId);
+    if (biz && biz.status === 'approved') {
+        if (currentView === 'home' || currentView === 'pending') showView('dashboard');
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
