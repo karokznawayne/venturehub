@@ -1,0 +1,7 @@
+node_modules/
+.env
+business_db.sqlite
+uploads/
+server.log
+server_restart.log
+test_api.js

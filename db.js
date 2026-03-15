@@ -1,39 +1,31 @@
-const sqlite3 = require('sqlite3');
-const { open } = require('sqlite');
+const { createClient } = require('@libsql/client');
 const bcrypt = require('bcrypt');
-const fs = require('fs');
 
-async function getDbConnection() {
-    return open({
-        filename: './business_db.sqlite',
-        driver: sqlite3.Database
+function getDbConnection() {
+    return createClient({
+        url: process.env.TURSO_URL,
+        authToken: process.env.TURSO_TOKEN,
     });
 }
 
 async function initializeDb() {
-    // Create uploads directory if it doesn't exist
-    if (!fs.existsSync('./uploads')) {
-        fs.mkdirSync('./uploads');
-    }
+    const db = getDbConnection();
 
-    const db = await getDbConnection();
-
-    // Users Table (Authentication)
-    // role can be: 'admin', 'business', 'client'
-    await db.exec(`
+    // Users Table
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'client',
-            is_verified BOOLEAN DEFAULT 0,
+            is_verified INTEGER DEFAULT 0,
+            is_featured INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
+        )
     `);
 
     // Business Profiles Table
-    // Added logo_url
-    await db.exec(`
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS business_profiles (
             id TEXT PRIMARY KEY,
             user_id TEXT UNIQUE,
@@ -47,28 +39,28 @@ async function initializeDb() {
             state TEXT,
             website TEXT,
             gst TEXT,
-            categories TEXT, 
+            categories TEXT,
             color TEXT,
             logo_url TEXT,
             status TEXT DEFAULT 'pending',
+            is_featured INTEGER DEFAULT 0,
             FOREIGN KEY(user_id) REFERENCES users(id)
-        );
+        )
     `);
 
     // Client Profiles Table
-    await db.exec(`
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS client_profiles (
             id TEXT PRIMARY KEY,
             user_id TEXT UNIQUE,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
             FOREIGN KEY(user_id) REFERENCES users(id)
-        );
+        )
     `);
 
     // Services Table
-    // 4. Services
-    await db.exec(`
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS services (
             id TEXT PRIMARY KEY,
             business_id TEXT,
@@ -90,8 +82,8 @@ async function initializeDb() {
         )
     `);
 
-    // 5. Products [NEW Phase 4]
-    await db.exec(`
+    // Products Table
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS products (
             id TEXT PRIMARY KEY,
             business_id TEXT,
@@ -109,8 +101,8 @@ async function initializeDb() {
         )
     `);
 
-    // 6. Evaluations [Updated Phase 5 with image_url]
-    await db.exec(`
+    // Evaluations Table
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS evaluations (
             id TEXT PRIMARY KEY,
             service_id TEXT,
@@ -125,8 +117,8 @@ async function initializeDb() {
         )
     `);
 
-    // 7. Enquiries [NEW Phase 5]
-    await db.exec(`
+    // Enquiries Table
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS enquiries (
             id TEXT PRIMARY KEY,
             business_id TEXT,
@@ -141,8 +133,8 @@ async function initializeDb() {
         )
     `);
 
-    // 8. Gallery Items [NEW Phase 5]
-    await db.exec(`
+    // Gallery Items Table
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS gallery_items (
             id TEXT PRIMARY KEY,
             business_id TEXT,
@@ -153,8 +145,8 @@ async function initializeDb() {
         )
     `);
 
-    // 9. Global Categories [NEW Phase 5]
-    await db.exec(`
+    // Global Categories Table
+    await db.execute(`
         CREATE TABLE IF NOT EXISTS global_categories (
             id TEXT PRIMARY KEY,
             name TEXT UNIQUE,
@@ -164,20 +156,18 @@ async function initializeDb() {
         )
     `);
 
-    // Alterations for Phase 5 [Featured Status]
-    try { await db.exec('ALTER TABLE business_profiles ADD COLUMN is_featured INTEGER DEFAULT 0'); } catch(e){}
-    try { await db.exec('ALTER TABLE users ADD COLUMN is_featured INTEGER DEFAULT 0'); } catch(e){}
-
-
     // Ensure Admin Exists
-    const adminExists = await db.get('SELECT * FROM users WHERE role = ?', ['admin']);
-    if (!adminExists) {
+    const result = await db.execute("SELECT * FROM users WHERE role = 'admin' LIMIT 1");
+    if (result.rows.length === 0) {
         const hashedPassword = await bcrypt.hash('admin123', 10);
-        await db.run('INSERT INTO users (id, email, password, role, is_verified) VALUES (?, ?, ?, ?, ?)', ['admin_1', 'admin@example.com', hashedPassword, 'admin', 1]);
+        await db.execute({
+            sql: 'INSERT INTO users (id, email, password, role, is_verified) VALUES (?, ?, ?, ?, ?)',
+            args: ['admin_1', 'admin@example.com', hashedPassword, 'admin', 1]
+        });
         console.log('Admin user created: admin@example.com / admin123');
     }
 
-    console.log('Database initialized successfully with Phase 3 schema.');
+    console.log('Turso DB initialized successfully.');
     return db;
 }
 
