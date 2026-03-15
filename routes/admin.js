@@ -12,16 +12,18 @@ router.get('/businesses', authenticateToken, requireAdmin, async (req, res) => {
         const formatted = await Promise.all(result.rows.map(async b => {
             let cats = [];
             try { cats = JSON.parse(b.categories || '[]'); } catch(e) { cats = []; }
-            const userResult = await db.execute({ sql: 'SELECT email FROM users WHERE id = ?', args: [b.id] });
+            const userResult = await db.execute({ sql: 'SELECT email, created_at FROM users WHERE id = ?', args: [b.id] });
+            const user = userResult.rows[0];
             return {
                 id: b.id, ref: b.id, type: b.type,
                 ownerFirst: b.owner_first, ownerLast: b.owner_last,
-                ownerEmail: userResult.rows[0]?.email || 'unknown',
+                ownerEmail: user?.email || 'unknown',
                 ownerPhone: b.owner_phone,
                 bizName: b.company_name, bizDesc: b.description,
                 bizCity: b.city, bizState: b.state, website: b.website, gst: b.gst,
                 categories: cats, status: b.status, color: b.color, logoUrl: b.logo_url,
-                isFeatured: b.is_featured === 1, submittedAt: b.created_at
+                isFeatured: b.is_featured === 1, 
+                submittedAt: user?.created_at
             };
         }));
 
