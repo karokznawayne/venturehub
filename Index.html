@@ -1992,8 +1992,6 @@ function switchDashTab(tabName, btn) {
   const content = document.getElementById(`dash-${tabName}-view`);
   if (content) content.classList.add('active');
 
-  if (tabName === 'services') renderDashboardServices();
-  if (tabName === 'products') renderDashboardProducts();
   if (tabName === 'leads') fetchAndRenderLeads();
   if (tabName === 'gallery') fetchAndRenderGallery();
   if (tabName === 'qr') renderBusinessQR();
@@ -2098,6 +2096,7 @@ function buildServiceCard(s, isOwner = false) {
   const bg = `linear-gradient(135deg, ${s.color || 'var(--teal)'} 0%, ${adjustColor(s.color || '#0d4040')} 100%)`;
   return `<div class="service-card">
     <div class="service-card-img" style="background:${bg}">
+      ${s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;">` : ''}
       <span style="position:relative;z-index:1;font-size:3rem;">${s.emoji || '🛠️'}</span>
       <div class="img-overlay"></div>
     </div>
