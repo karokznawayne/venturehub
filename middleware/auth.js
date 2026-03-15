@@ -21,8 +21,9 @@ async function requireVerifiedBusiness(req, res, next) {
     // Check database for real-time verification status instead of relying on JWT payload
     try {
         const { getDbConnection } = require('../db');
-        const db = await getDbConnection();
-        const user = await db.get('SELECT is_verified FROM users WHERE id = ?', [req.user.id]);
+        const db = getDbConnection();
+        const result = await db.execute({ sql: 'SELECT is_verified FROM users WHERE id = ?', args: [req.user.id] });
+        const user = result.rows[0];
         
         if (req.user.role !== 'business' || !user || !user.is_verified) {
             return res.status(403).json({ error: 'Access denied: Requires verified business account' });

@@ -2185,20 +2185,24 @@ async function saveService() {
   const token = State.getToken();
   const biz = State.getBusinesses().find(b => b.id === user.bizId);
 
-  const payload = {
-    id: editingServiceId || 'svc_' + Date.now(),
-    bizId: user.bizId,
-    bizName: biz?.bizName || 'Unknown',
-    name,
-    description: desc,
-    price: Number(price),
-    priceType: document.getElementById('svc-price-type').value,
-    category: document.getElementById('svc-category').value,
-    categories: JSON.stringify([document.getElementById('svc-category').value]),
-    emoji: document.getElementById('svc-emoji').value || '🛠️',
-    color: biz?.color || getRandomColor(),
-    createdAt: new Date().toISOString()
-  };
+  const formData = new FormData();
+  formData.append('id', editingServiceId || 'svc_' + Date.now());
+  formData.append('bizId', user.bizId);
+  formData.append('bizName', biz?.bizName || 'Unknown');
+  formData.append('name', name);
+  formData.append('description', desc);
+  formData.append('price', Number(price));
+  formData.append('priceType', document.getElementById('svc-price-type').value);
+  formData.append('category', document.getElementById('svc-category').value);
+  formData.append('categories', JSON.stringify([document.getElementById('svc-category').value]));
+  formData.append('emoji', document.getElementById('svc-emoji').value || '🛠️');
+  formData.append('color', biz?.color || getRandomColor());
+  formData.append('createdAt', new Date().toISOString());
+
+  const imageInput = document.getElementById('svc-image');
+  if (imageInput && imageInput.files && imageInput.files[0]) {
+    formData.append('image', imageInput.files[0]);
+  }
 
   try {
     const method = editingServiceId ? 'PUT' : 'POST';
@@ -2206,11 +2210,8 @@ async function saveService() {
     
     const res = await fetch(url, {
       method,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify(payload)
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
     });
 
     const data = await res.json();
