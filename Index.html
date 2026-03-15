@@ -1821,10 +1821,17 @@ function selectType(type) {
   collabSec.classList.toggle('show', type === 'collaborative');
 }
 
-function toggleCategory(cat, el) {
+function toggleCategory(el) {
+  const cat = el.getAttribute('data-cat');
+  if (!cat) return;
   const idx = selectedCategories.indexOf(cat);
-  if (idx === -1) { selectedCategories.push(cat); el.classList.add('selected'); }
-  else { selectedCategories.splice(idx, 1); el.classList.remove('selected'); }
+  if (idx === -1) { 
+    selectedCategories.push(cat); 
+    el.classList.add('selected'); 
+  } else { 
+    selectedCategories.splice(idx, 1); 
+    el.classList.remove('selected'); 
+  }
 }
 
 function addPartner() {
